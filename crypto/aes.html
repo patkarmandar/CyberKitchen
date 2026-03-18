@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES Encrypt/Decrypt Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --error: #ef4444;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --error: #ef4444;
+      --border: #475569;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 12px;
+      line-height: 1.5;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .panel, textarea, input, select, .btn {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .header-actions {
+      position: absolute;
+      right: 0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      border-color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 360px 1fr;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 4px var(--shadow);
+      height: calc(100vh - 80px);
+      max-height: 650px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .data-panel {
+      /* Inherits flex from .panel */
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      resize: vertical;
+      padding: 10px;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 12px;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    textarea::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .controls::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .controls::-webkit-scrollbar-track {
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+    }
+
+    .controls::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    .controls::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      background: var(--bg-primary);
+    }
+
+    .input-group {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-small {
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .bottom-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-encrypt {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .btn-decrypt {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    .btn-encrypt:hover, .btn-decrypt:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .status.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      border: 1px solid var(--error);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 10px 0;
+    }
+
+    .divider.spacer {
+      margin-top: auto;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 1200px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .controls {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+
+      .header-actions {
+        gap: 6px;
+      }
+
+      .theme-toggle {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .panel {
+        padding: 10px;
+        height: auto;
+        min-height: 400px;
+      }
+
+      .action-buttons, .bottom-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status {
+      animation: fadeIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>AES Encryption Tool</h1>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">🌙</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: Encrypted Data -->
+    <div class="panel data-panel">
+      <h3>🔒 Encrypted Data</h3>
+      <div class="toolbar">
+        <button class="btn btn-secondary btn-small" onclick="copyText('encryptedData')">📋 Copy</button>
+        <button class="btn btn-secondary btn-small" onclick="clearField('encryptedData')">🗑️ Clear</button>
+        <button class="btn btn-secondary btn-small" onclick="downloadText('encryptedData', 'encrypted.txt')">⬇️ Download</button>
+      </div>
+      <textarea id="encryptedData" placeholder="Encrypted data will appear here..."></textarea>
+    </div>
+
+    <!-- MIDDLE: Controls -->
+    <div class="panel controls">
+      <h3>⚙️ Configuration</h3>
+      
+      <div class="field">
+        <label>Encryption Key</label>
+        <div class="input-group">
+          <input id="key" type="text" placeholder="Enter encryption key">
+          <button class="btn btn-secondary btn-small" onclick="generateKey()">🎲</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Key Format</label>
+        <select id="keyFormat">
+          <option value="utf8">UTF-8 String</option>
+          <option value="hex">Hexadecimal</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Initialization Vector (IV)</label>
+        <div class="input-group">
+          <input id="iv" type="text" placeholder="Enter IV (required for CBC)">
+          <button class="btn btn-secondary btn-small" onclick="generateIV()">🎲</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>IV Format</label>
+        <select id="ivFormat">
+          <option value="utf8">UTF-8 String</option>
+          <option value="hex">Hexadecimal</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>AES Mode</label>
+        <select id="mode" onchange="toggleIVRequirement()">
+          <option value="CBC">CBC (Cipher Block Chaining)</option>
+          <option value="ECB">ECB (Electronic Codebook)</option>
+          <option value="CFB">CFB (Cipher Feedback)</option>
+          <option value="OFB">OFB (Output Feedback)</option>
+          <option value="CTR">CTR (Counter)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Padding</label>
+        <select id="padding">
+          <option value="Pkcs7">PKCS#7</option>
+          <option value="NoPadding">No Padding</option>
+          <option value="ZeroPadding">Zero Padding</option>
+          <option value="Iso10126">ISO 10126</option>
+          <option value="AnsiX923">ANSI X9.23</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Output Format</label>
+        <select id="outputFormat">
+          <option value="base64">Base64</option>
+          <option value="hex">Hexadecimal</option>
+        </select>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-encrypt" onclick="encryptData()">🔒 Encrypt</button>
+        <button class="btn btn-decrypt" onclick="decryptData()">🔓 Decrypt</button>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="divider spacer"></div>
+
+      <div class="bottom-buttons">
+        <button class="btn btn-secondary" onclick="shareConfig()">🔗 Share URL</button>
+        <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset All</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Decrypted Data -->
+    <div class="panel data-panel">
+      <h3>📝 Decrypted Data</h3>
+      <div class="toolbar">
+        <button class="btn btn-secondary btn-small" onclick="copyText('decryptedData')">📋 Copy</button>
+        <button class="btn btn-secondary btn-small" onclick="clearField('decryptedData')">🗑️ Clear</button>
+        <button class="btn btn-secondary btn-small" onclick="downloadText('decryptedData', 'decrypted.txt')">⬇️ Download</button>
+      </div>
+      <textarea id="decryptedData" placeholder="Enter plaintext to encrypt or view decrypted data here..."></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+// Cache DOM elements
+const elements = {
+  key: document.getElementById('key'),
+  keyFormat: document.getElementById('keyFormat'),
+  iv: document.getElementById('iv'),
+  ivFormat: document.getElementById('ivFormat'),
+  mode: document.getElementById('mode'),
+  padding: document.getElementById('padding'),
+  outputFormat: document.getElementById('outputFormat'),
+  encryptedData: document.getElementById('encryptedData'),
+  decryptedData: document.getElementById('decryptedData'),
+  status: document.getElementById('status')
+};
+
+// Parse input based on format
+function parseInput(value, format) {
+  if (!value) return null;
+  return format === "hex" ? CryptoJS.enc.Hex.parse(value) : CryptoJS.enc.Utf8.parse(value);
+}
+
+// Validate key and IV lengths
+function validateInputs() {
+  const keyLength = elements.key.value.length;
+  const mode = elements.mode.value;
+  
+  if (!elements.key.value) {
+    throw new Error('Encryption key is required');
+  }
+
+  if (mode !== 'ECB' && !elements.iv.value) {
+    throw new Error(`IV is required for ${mode} mode`);
+  }
+
+  // AES key length validation (16, 24, or 32 bytes for AES-128, AES-192, AES-256)
+  const format = elements.keyFormat.value;
+  const expectedLength = format === 'hex' ? [32, 48, 64] : [16, 24, 32];
+  
+  if (!expectedLength.includes(keyLength)) {
+    console.warn(`Key length is ${keyLength}. Expected: ${expectedLength.join(', ')} for ${format} format`);
+  }
+
+  return true;
+}
+
+// Show status message
+function showStatus(message, type = 'success') {
+  elements.status.textContent = message;
+  elements.status.className = `status ${type}`;
+  elements.status.style.display = 'block';
+  
+  setTimeout(() => {
+    elements.status.style.display = 'none';
+  }, 3000);
+}
+
+// Encrypt data
+function encryptData() {
+  try {
+    validateInputs();
+    
+    const plaintext = elements.decryptedData.value;
+    if (!plaintext) {
+      throw new Error('Please enter data to encrypt');
+    }
+
+    const key = parseInput(elements.key.value, elements.keyFormat.value);
+    const iv = parseInput(elements.iv.value, elements.ivFormat.value);
+    const mode = elements.mode.value;
+
+    const encrypted = CryptoJS.AES.encrypt(
+      CryptoJS.enc.Utf8.parse(plaintext),
+      key,
+      {
+        iv: mode === 'ECB' ? undefined : iv,
+        mode: CryptoJS.mode[mode],
+        padding: CryptoJS.pad[elements.padding.value]
+      }
+    );
+
+    const outputFormat = elements.outputFormat.value;
+    const output = outputFormat === 'base64' 
+      ? encrypted.ciphertext.toString(CryptoJS.enc.Base64)
+      : encrypted.ciphertext.toString(CryptoJS.enc.Hex);
+
+    elements.encryptedData.value = output;
+    showStatus('✅ Encryption successful!', 'success');
+  } catch (e) {
+    showStatus(`❌ Encryption failed: ${e.message}`, 'error');
+    console.error(e);
+  }
+}
+
+// Decrypt data
+function decryptData() {
+  try {
+    validateInputs();
+    
+    const ciphertext = elements.encryptedData.value.trim();
+    if (!ciphertext) {
+      throw new Error('Please enter encrypted data to decrypt');
+    }
+
+    const key = parseInput(elements.key.value, elements.keyFormat.value);
+    const iv = parseInput(elements.iv.value, elements.ivFormat.value);
+    const mode = elements.mode.value;
+    const outputFormat = elements.outputFormat.value;
+
+    const ciphertextParsed = outputFormat === 'base64'
+      ? CryptoJS.enc.Base64.parse(ciphertext)
+      : CryptoJS.enc.Hex.parse(ciphertext);
+
+    const decrypted = CryptoJS.AES.decrypt(
+      { ciphertext: ciphertextParsed },
+      key,
+      {
+        iv: mode === 'ECB' ? undefined : iv,
+        mode: CryptoJS.mode[mode],
+        padding: CryptoJS.pad[elements.padding.value]
+      }
+    );
+
+    const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+    
+    if (!plaintext) {
+      throw new Error('Decryption produced empty result. Check your key, IV, and settings.');
+    }
+
+    elements.decryptedData.value = plaintext;
+    showStatus('✅ Decryption successful!', 'success');
+  } catch (e) {
+    showStatus(`❌ Decryption failed: ${e.message}`, 'error');
+    console.error(e);
+  }
+}
+
+// Generate random key (256-bit / 32 bytes)
+function generateKey() {
+  const format = elements.keyFormat.value;
+  const randomKey = CryptoJS.lib.WordArray.random(32);
+  
+  elements.key.value = format === 'hex' 
+    ? randomKey.toString(CryptoJS.enc.Hex)
+    : randomKey.toString(CryptoJS.enc.Base64).substring(0, 32);
+  
+  showStatus('🔑 Random key generated', 'success');
+}
+
+// Generate random IV (128-bit / 16 bytes)
+function generateIV() {
+  const format = elements.ivFormat.value;
+  const randomIV = CryptoJS.lib.WordArray.random(16);
+  
+  elements.iv.value = format === 'hex'
+    ? randomIV.toString(CryptoJS.enc.Hex)
+    : randomIV.toString(CryptoJS.enc.Base64).substring(0, 16);
+  
+  showStatus('🎲 Random IV generated', 'success');
+}
+
+// Toggle IV requirement based on mode
+function toggleIVRequirement() {
+  const mode = elements.mode.value;
+  const ivField = elements.iv.parentElement.parentElement;
+  const ivFormatField = elements.ivFormat.parentElement;
+  
+  if (mode === 'ECB') {
+    ivField.style.opacity = '0.5';
+    ivFormatField.style.opacity = '0.5';
+    elements.iv.disabled = true;
+    elements.ivFormat.disabled = true;
+  } else {
+    ivField.style.opacity = '1';
+    ivFormatField.style.opacity = '1';
+    elements.iv.disabled = false;
+    elements.ivFormat.disabled = false;
+  }
+}
+
+// Copy text to clipboard
+function copyText(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element.value) {
+    showStatus('⚠️ Nothing to copy', 'error');
+    return;
+  }
+  
+  element.select();
+  document.execCommand('copy');
+  showStatus('📋 Copied to clipboard!', 'success');
+}
+
+// Clear field
+function clearField(elementId) {
+  document.getElementById(elementId).value = '';
+  showStatus('🗑️ Field cleared', 'success');
+}
+
+// Download text as file
+function downloadText(elementId, filename) {
+  const text = document.getElementById(elementId).value;
+  if (!text) {
+    showStatus('⚠️ Nothing to download', 'error');
+    return;
+  }
+  
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  showStatus('⬇️ Download started', 'success');
+}
+
+// Reset all fields
+function resetAll() {
+  if (confirm('Are you sure you want to reset all fields?')) {
+    elements.key.value = '';
+    elements.iv.value = '';
+    elements.encryptedData.value = '';
+    elements.decryptedData.value = '';
+    elements.keyFormat.value = 'utf8';
+    elements.ivFormat.value = 'utf8';
+    elements.mode.value = 'CBC';
+    elements.padding.value = 'Pkcs7';
+    elements.outputFormat.value = 'base64';
+    toggleIVRequirement();
+    showStatus('🔄 All fields reset', 'success');
+  }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Ctrl/Cmd + Enter to encrypt/decrypt
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (document.activeElement.id === 'encryptedData') {
+      decryptData();
+    } else if (document.activeElement.id === 'decryptedData') {
+      encryptData();
+    }
+  }
+  
+  // Ctrl/Cmd + K to generate key
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    generateKey();
+  }
+  
+  // Ctrl/Cmd + I to generate IV
+  if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+    e.preventDefault();
+    generateIV();
+  }
+});
+
+// Theme toggle functionality
+function toggleTheme() {
+  const html = document.documentElement;
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  const themeToggle = document.getElementById('themeToggle');
+  
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  
+  // Update toggle icon
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+  themeToggle.title = `Switch to ${newTheme === 'dark' ? 'light' : 'dark'} theme`;
+}
+
+// Load saved theme preference
+function loadTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  const themeToggle = document.getElementById('themeToggle');
+  
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  themeToggle.title = `Switch to ${savedTheme === 'dark' ? 'light' : 'dark'} theme`;
+}
+
+// Share configuration (safe - no keys or data)
+function shareConfig() {
+  const config = {
+    mode: elements.mode.value,
+    padding: elements.padding.value,
+    outputFormat: elements.outputFormat.value,
+    keyFormat: elements.keyFormat.value,
+    ivFormat: elements.ivFormat.value
+  };
+  
+  const params = new URLSearchParams();
+  params.set('config', btoa(JSON.stringify(config)));
+  
+  const shareUrl = window.location.origin + window.location.pathname + '?' + params.toString();
+  
+  // Copy to clipboard
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showStatus('🔗 Configuration link copied to clipboard!', 'success');
+    }).catch(() => {
+      fallbackCopyTextToClipboard(shareUrl);
+    });
+  } else {
+    fallbackCopyTextToClipboard(shareUrl);
+  }
+}
+
+// Fallback for older browsers
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.top = '-9999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    showStatus('🔗 Configuration link copied to clipboard!', 'success');
+  } catch (err) {
+    showStatus('❌ Failed to copy. Please copy manually from the alert.', 'error');
+    alert('Share this URL:\n\n' + text);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Load configuration from URL
+function loadConfigFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const configParam = params.get('config');
+  
+  if (configParam) {
+    try {
+      const config = JSON.parse(atob(configParam));
+      
+      if (config.mode) elements.mode.value = config.mode;
+      if (config.padding) elements.padding.value = config.padding;
+      if (config.outputFormat) elements.outputFormat.value = config.outputFormat;
+      if (config.keyFormat) elements.keyFormat.value = config.keyFormat;
+      if (config.ivFormat) elements.ivFormat.value = config.ivFormat;
+      
+      toggleIVRequirement();
+      showStatus('⚙️ Configuration loaded from URL', 'success');
+    } catch (e) {
+      console.error('Failed to load config from URL:', e);
+    }
+  }
+}
+
+// Initialize
+loadTheme();
+loadConfigFromURL();
+toggleIVRequirement();
+
+// Add input validation hints
+elements.key.addEventListener('input', () => {
+  const length = elements.key.value.length;
+  const format = elements.keyFormat.value;
+  const expectedLengths = format === 'hex' ? [32, 48, 64] : [16, 24, 32];
+  
+  if (length > 0 && !expectedLengths.includes(length)) {
+    elements.key.style.borderColor = '#f59e0b';
+  } else {
+    elements.key.style.borderColor = '';
+  }
+});
+
+console.log('%c🔐 AES Encryption Tool', 'font-size: 16px; font-weight: bold; color: #3b82f6;');
+console.log('Keyboard shortcuts:');
+console.log('  Ctrl/Cmd + Enter: Encrypt/Decrypt based on active field');
+console.log('  Ctrl/Cmd + K: Generate random key');
+console.log('  Ctrl/Cmd + I: Generate random IV');
+</script>
+
+</body>
+</html>
