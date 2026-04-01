@@ -5,14 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RSA Encrypt / Decrypt Tool</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- forge.all includes PKI / RSA — forge.min is core-only and lacks pki.rsa -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/node-forge/1.3.1/forge.all.min.js"></script>
-  <script>
-    // Fallback to jsdelivr if cdnjs didn't load forge
-    if (typeof forge === 'undefined') {
-      document.write('<script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.all.min.js"><\/script>');
-    }
-  </script>
   <style>
     :root {
       --bg:     #f8fafc;
@@ -22,7 +14,6 @@
       --txt:    #0f172a;
       --muted:  #64748b;
       --acc:    #3b82f6;
-      --acc2:   #2563eb;
       --ok:     #10b981;
       --err:    #ef4444;
       --warn:   #f59e0b;
@@ -30,50 +21,52 @@
       --shd:    rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
-      --bg:    #0d1117;
-      --surf:  #161b22;
-      --inset: #21262d;
-      --inset2:#2d333b;
-      --txt:   #e6edf3;
-      --muted: #8b949e;
-      --bdr:   #30363d;
-      --shd:   rgba(0,0,0,.4);
+      --bg:    #0d1117;  --surf:  #161b22;
+      --inset: #21262d;  --inset2:#2d333b;
+      --txt:   #e6edf3;  --muted: #8b949e;
+      --bdr:   #30363d;  --shd:   rgba(0,0,0,.4);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14.5px;
-      background: var(--bg); color: var(--txt);
+      font-size: 14.5px; background: var(--bg); color: var(--txt);
       padding: 10px 14px; line-height: 1.5;
       transition: background .25s, color .25s;
     }
 
-    /* ─── Header ──────────────────────────────────────────── */
+    /* Header */
     .container { max-width: 1800px; margin: 0 auto; }
-
     header {
-      display: flex; align-items: center; justify-content: center;
-      position: relative; margin-bottom: 10px; min-height: 38px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 10px; min-height: 38px;
     }
+    .hdr-left  { display: flex; align-items: center; justify-content: flex-start; min-width: 0; }
+    .hdr-right { display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0; }
     h1 {
+      text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 0 8px;
       font-size: 22px; font-weight: 800; letter-spacing: -.3px;
-      background: linear-gradient(130deg, #f59e0b 0%, #ef4444 55%, #8b5cf6 100%);
+      background: linear-gradient(130deg, #f59e0b 0%, #ef4444 50%, #8b5cf6 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hdr-left { position: absolute; left: 0; }
-    .hdr-right { position: absolute; right: 0; display: flex; gap: 6px; align-items: center; }
-
     .home-link {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 12px; font-weight: 600; color: var(--muted);
       text-decoration: none; padding: 5px 10px;
       border: 1px solid var(--bdr); border-radius: 7px;
       background: var(--surf); transition: all .18s;
+      white-space: nowrap; overflow: hidden; min-width: 0;
     }
     .home-link:hover { color: var(--acc); border-color: var(--acc); background: var(--inset); }
-
+    .home-link i { font-size: 12px; flex-shrink: 0; }
+    @media (max-width: 540px) {
+      .home-link .link-text { display: none; }
+      .home-link { padding: 5px 8px; gap: 4px; }
+    }
     .icon-btn {
       width: 34px; height: 34px; border-radius: 8px;
       background: var(--surf); border: 1px solid var(--bdr);
@@ -82,41 +75,28 @@
     }
     .icon-btn:hover { border-color: var(--acc); color: var(--acc); transform: scale(1.08); }
 
-    /* ─── 3-col layout ─────────────────────────────────────── */
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 340px 1fr;
-      gap: 10px;
-    }
-
-    /* ─── Panel ────────────────────────────────────────────── */
+    /* Layout */
+    .layout { display: grid; grid-template-columns: 1fr 350px 1fr; gap: 10px; }
     .panel {
-      background: var(--surf);
-      border: 1px solid var(--bdr);
-      border-radius: 10px;
-      padding: 12px;
+      background: var(--surf); border: 1px solid var(--bdr);
+      border-radius: 10px; padding: 12px;
       box-shadow: 0 1px 4px var(--shd);
       display: flex; flex-direction: column; gap: 8px;
-      height: calc(100vh - 70px);
-      min-height: 520px; max-height: 800px;
+      height: calc(100vh - 70px); min-height: 520px; max-height: 820px;
     }
     .panel-hdr {
       font-size: 13px; font-weight: 700; letter-spacing: .03em;
-      color: var(--txt); display: flex; align-items: center; gap: 6px;
-      flex-shrink: 0;
+      color: var(--txt); display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     }
     .panel-hdr i { font-size: 13px; color: var(--muted); }
 
-    /* ─── Toolbar: single line, no wrap ───────────────────── */
-    .toolbar {
-      display: flex; align-items: center; gap: 5px;
-      flex-wrap: nowrap; flex-shrink: 0;
-    }
+    /* Toolbar */
+    .toolbar { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; flex-shrink: 0; }
     .tb-sep  { width: 1px; height: 14px; background: var(--bdr); flex-shrink: 0; margin: 0 2px; }
     .tb-fill { flex: 1; min-width: 0; }
     .tb-label { font-size: 12px; color: var(--txt); white-space: nowrap; flex-shrink: 0; font-weight: 700; }
 
-    /* ─── Main textarea (ciphertext / plaintext) ───────────── */
+    /* Main textareas (ciphertext / plaintext) */
     textarea {
       flex: 1; width: 100%; resize: none; min-height: 0;
       padding: 9px 10px;
@@ -132,7 +112,7 @@
     textarea::-webkit-scrollbar { width: 6px; }
     textarea::-webkit-scrollbar-thumb { background: var(--bdr); border-radius: 3px; }
 
-    /* ─── Controls (middle) ────────────────────────────────── */
+    /* Controls */
     .ctrl-scroll {
       flex: 1; display: flex; flex-direction: column; gap: 7px;
       overflow-y: auto; min-height: 0; padding-right: 2px;
@@ -142,11 +122,11 @@
 
     .field { display: flex; flex-direction: column; gap: 3px; }
     .field > label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .field-note { font-size: 10.5px; font-weight: 400; color: var(--muted); margin-left: 4px; }
 
-    /* ─── PEM key textareas (compact, scrollable) ──────────── */
-    .pem-wrap { position: relative; }
+    /* PEM textareas */
     .pem-ta {
-      width: 100%; height: 80px; resize: none;
+      width: 100%; height: 78px; resize: none;
       padding: 7px 9px;
       font-family: 'SF Mono', 'Fira Code', 'Menlo', 'Consolas', monospace;
       font-size: 10.5px; line-height: 1.5;
@@ -159,36 +139,12 @@
     .pem-ta::placeholder { color: var(--muted); opacity: .6; font-style: italic; }
     .pem-ta::-webkit-scrollbar { width: 5px; }
     .pem-ta::-webkit-scrollbar-thumb { background: var(--bdr); border-radius: 3px; }
-    .pem-ta.pem-ok   { border-color: var(--ok)  !important; }
-    .pem-ta.pem-err  { border-color: var(--err)  !important; }
+    .pem-ta.pem-ok  { border-color: var(--ok)  !important; }
+    .pem-ta.pem-err { border-color: var(--err) !important; }
 
-    .pem-row { display: flex; gap: 5px; align-items: center; }
+    .pem-row { display: flex; gap: 5px; }
 
-    /* ─── Key status badge ─────────────────────────────────── */
-    .key-status {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--inset); border: 1px solid var(--bdr);
-      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--muted);
-      flex-shrink: 0;
-    }
-    .badge {
-      font-size: 10px; font-weight: 700; padding: 2px 7px;
-      border-radius: 4px; letter-spacing: .04em;
-      background: var(--inset2); color: var(--muted);
-    }
-    .badge-ok  { background: rgba(16,185,129,.15); color: #10b981; }
-    .badge-err { background: rgba(239,68,68,.15);  color: var(--err); }
-    .badge-inf { background: rgba(59,130,246,.15);  color: #3b82f6; }
-    .badge-warn{ background: rgba(245,158,11,.15);  color: var(--warn); }
-
-    /* ─── Max-size info bar ────────────────────────────────── */
-    .info-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--inset); border: 1px solid var(--bdr);
-      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--muted);
-    }
-
-    /* ─── Form controls ────────────────────────────────────── */
+    /* Inputs & selects */
     input[type="text"], select {
       background: var(--inset); color: var(--txt);
       border: 1px solid var(--bdr); border-radius: 6px;
@@ -199,63 +155,56 @@
     }
     input:valid, input:invalid,
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
-      border-color: var(--bdr) !important;
-      box-shadow: none !important; outline: none !important;
+      border-color: var(--bdr) !important; box-shadow: none !important; outline: none !important;
     }
     input[type="text"]:focus, select:focus { border-color: var(--acc); background: var(--bg); }
+    select.sm { padding: 5px 5px; font-size: 12px; border-radius: 5px; cursor: pointer; flex-shrink: 0; width: auto; }
 
-    select.sm {
-      padding: 5px 5px; font-size: 12px; border-radius: 5px;
-      cursor: pointer; flex-shrink: 0; width: auto;
-    }
+    .row2 { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; }
 
-    /* ─── Inline row (2 items side by side) ───────────────── */
-    .inline-row {
-      display: grid; grid-template-columns: 1fr auto;
-      gap: 6px; align-items: center;
+    /* Badges / info bars */
+    .key-status, .info-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--inset); border: 1px solid var(--bdr);
+      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--muted);
     }
-    .inline-row-3 {
-      display: grid; grid-template-columns: auto 1fr auto;
-      gap: 6px; align-items: center;
+    .badge {
+      font-size: 10px; font-weight: 700; padding: 2px 7px;
+      border-radius: 4px; letter-spacing: .04em;
+      background: var(--inset2); color: var(--muted);
     }
+    .badge-ok   { background: rgba(16,185,129,.15); color: #10b981; }
+    .badge-err  { background: rgba(239,68,68,.15);  color: var(--err); }
+    .badge-inf  { background: rgba(59,130,246,.15);  color: #3b82f6; }
+    .badge-warn { background: rgba(245,158,11,.15);  color: var(--warn); }
 
-    /* ─── Buttons ──────────────────────────────────────────── */
+    /* Buttons */
     .btn {
       border: none; border-radius: 6px; font-weight: 400;
       cursor: pointer; display: inline-flex; align-items: center;
       justify-content: center; gap: 5px; transition: all .16s;
       white-space: nowrap; flex-shrink: 0; font-size: 12px;
     }
-    .btn:active { transform: scale(.95); }
-    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
+    .btn:active  { transform: scale(.95); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; filter: none !important; }
     .btn.xs { padding: 4px 8px;  font-size: 12px; }
     .btn.sm { padding: 5px 10px; font-size: 13px; }
-
-    .btn-ghost {
-      background: var(--inset); color: var(--txt);
-      border: 1px solid var(--bdr);
-    }
+    .btn-ghost { background: var(--inset); color: var(--txt); border: 1px solid var(--bdr); }
     .btn-ghost:hover:not(:disabled) { background: var(--inset2); }
 
     .btn-gen {
-      width: 100%; padding: 8px;
+      width: 100%; padding: 9px;
       background: linear-gradient(135deg, #f59e0b, #ef4444);
-      color: #fff; font-size: 13px; border-radius: 6px;
-      border: none; cursor: pointer; font-weight: 700;
+      color: #fff; font-size: 13px; font-weight: 700; border-radius: 6px;
+      border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: all .18s;
     }
     .btn-gen:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px var(--shd); }
-    .btn-gen:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-gen:disabled { opacity: .45; cursor: not-allowed; transform: none; filter: none; }
 
-    .btn-enc {
-      flex: 1; background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff; padding: 9px 12px; font-size: 13px; font-weight: 700;
-    }
-    .btn-dec {
-      flex: 1; background: linear-gradient(135deg, #3b82f6, #2563eb);
-      color: #fff; padding: 9px 12px; font-size: 13px; font-weight: 700;
-    }
+    .btn-enc { flex:1; background: linear-gradient(135deg,#10b981,#059669); color:#fff; padding:9px 12px; font-size:13px; font-weight:700; }
+    .btn-dec { flex:1; background: linear-gradient(135deg,#3b82f6,#2563eb); color:#fff; padding:9px 12px; font-size:13px; font-weight:700; }
     .btn-enc:hover:not(:disabled), .btn-dec:hover:not(:disabled) {
       filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px var(--shd);
     }
@@ -271,11 +220,10 @@
 
     .act-row { display: flex; gap: 7px; }
     .bot-row { display: flex; gap: 6px; }
-
     .divider { height: 1px; background: var(--bdr); flex-shrink: 0; }
     .spacer  { flex: 1; min-height: 2px; }
 
-    /* ─── Status ───────────────────────────────────────────── */
+    /* Status */
     .status {
       padding: 6px 10px; border-radius: 6px; font-size: 13px;
       display: none; flex-shrink: 0; animation: pop .2s ease;
@@ -283,29 +231,23 @@
     .status.success { background: rgba(16,185,129,.12); color: var(--ok);   border: 1px solid rgba(16,185,129,.25); }
     .status.error   { background: rgba(239,68,68,.12);  color: var(--err);  border: 1px solid rgba(239,68,68,.25); }
     .status.warn    { background: rgba(245,158,11,.12); color: var(--warn); border: 1px solid rgba(245,158,11,.25); }
-
     @keyframes pop { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } }
 
-    /* ─── Responsive ───────────────────────────────────────── */
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       .panel  { height: auto; max-height: none; min-height: 260px; }
       textarea { min-height: 150px; }
     }
-    @media (max-width: 600px) {
-      body { padding: 6px 8px; }
-      h1   { font-size: 18px; }
-    }
+    @media (max-width: 600px) { body { padding: 6px 8px; } h1 { font-size: 17px; } }
   </style>
 </head>
 <body>
 <div class="container">
-
   <header>
     <div class="hdr-left">
       <a href="/CyberKitchen" class="home-link" title="Back to CyberKitchen">
         <i class="fa-solid fa-arrow-left"></i>
-        CyberKitchen
+        <span class="link-text">CyberKitchen</span>
       </a>
     </div>
     <h1>RSA Encrypt / Decrypt</h1>
@@ -318,11 +260,9 @@
 
   <div class="layout">
 
-    <!-- ══ LEFT: Ciphertext ══════════════════════════════════ -->
+    <!-- LEFT: Ciphertext -->
     <div class="panel">
-      <div class="panel-hdr">
-        <i class="fa-solid fa-lock"></i> CIPHERTEXT
-      </div>
+      <div class="panel-hdr"><i class="fa-solid fa-lock"></i> CIPHERTEXT</div>
       <div class="toolbar">
         <button class="btn btn-ghost xs" onclick="copyText('ct')"><i class="fa-regular fa-copy"></i> Copy</button>
         <button class="btn btn-ghost xs" onclick="clearField('ct')"><i class="fa-regular fa-trash-can"></i> Clear</button>
@@ -334,37 +274,29 @@
           <option value="hex">Hex</option>
         </select>
         <div class="tb-fill"></div>
-        <button class="swap-btn" onclick="swapPanels()" title="Swap ciphertext and plaintext">
-          <i class="fa-solid fa-right-left"></i> Swap
-        </button>
+        <button class="swap-btn" onclick="swapPanels()"><i class="fa-solid fa-right-left"></i> Swap</button>
       </div>
       <textarea id="ct" placeholder="Paste ciphertext here to decrypt"></textarea>
     </div>
 
-    <!-- ══ MIDDLE: Configuration ═════════════════════════════ -->
+    <!-- MIDDLE: Configuration -->
     <div class="panel">
-      <div class="panel-hdr">
-        <i class="fa-solid fa-gear"></i> CONFIGURATION
-      </div>
+      <div class="panel-hdr"><i class="fa-solid fa-gear"></i> CONFIGURATION</div>
       <div class="ctrl-scroll">
 
-        <!-- Key Generation -->
+        <!-- Key size + Generate -->
         <div class="field">
           <label>Key Size</label>
-          <div class="inline-row">
-            <select id="keySize" onchange="updateMaxSize()">
+          <div class="row2">
+            <select id="keySize">
               <option value="1024">RSA-1024</option>
               <option value="2048" selected>RSA-2048  (recommended)</option>
-              <option value="3072">RSA-3072</option>
               <option value="4096">RSA-4096</option>
             </select>
-            <button class="btn btn-ghost xs" onclick="generateKeyPair()" id="genBtn" title="Generate new RSA key pair">
-              <i class="fa-solid fa-key"></i> Generate
-            </button>
           </div>
         </div>
 
-        <button class="btn-gen" onclick="generateKeyPair()" id="genBtnBig">
+        <button class="btn-gen" id="genBtn" onclick="generateKeyPair()">
           <i class="fa-solid fa-key" id="genIcon"></i>
           <span id="genLabel">Generate Key Pair</span>
         </button>
@@ -373,38 +305,34 @@
 
         <!-- Public Key -->
         <div class="field">
-          <label>Public Key  <span style="font-weight:400;font-size:10px">(for encryption)</span></label>
+          <label>Public Key <span class="field-note">(for encryption)</span></label>
           <textarea class="pem-ta" id="pubKey"
-            placeholder="-----BEGIN PUBLIC KEY-----&#10;Paste or generate a public key&#10;-----END PUBLIC KEY-----"
-            oninput="onPubKeyInput()" spellcheck="false"></textarea>
+            placeholder="-----BEGIN PUBLIC KEY-----&#10;Paste public key here&#10;-----END PUBLIC KEY-----"
+            oninput="validatePubKey()" spellcheck="false"></textarea>
           <div class="pem-row">
             <button class="btn btn-ghost xs" onclick="copyPem('pubKey')"><i class="fa-regular fa-copy"></i> Copy</button>
             <button class="btn btn-ghost xs" onclick="clearPem('pubKey')"><i class="fa-regular fa-trash-can"></i> Clear</button>
             <button class="btn btn-ghost xs" onclick="importPem('pubKey')"><i class="fa-solid fa-folder-open"></i> Import</button>
           </div>
         </div>
-
-        <!-- Public key status -->
-        <div class="key-status" id="pubStatus">
+        <div class="key-status">
           <span>Public key</span>
           <span class="badge" id="pubBadge">—</span>
         </div>
 
         <!-- Private Key -->
         <div class="field">
-          <label>Private Key  <span style="font-weight:400;font-size:10px">(for decryption)</span></label>
+          <label>Private Key <span class="field-note">(for decryption)</span></label>
           <textarea class="pem-ta" id="privKey"
-            placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;Paste or generate a private key&#10;-----END RSA PRIVATE KEY-----"
-            oninput="onPrivKeyInput()" spellcheck="false"></textarea>
+            placeholder="-----BEGIN PRIVATE KEY-----&#10;Paste private key here&#10;-----END PRIVATE KEY-----"
+            oninput="validatePrivKey()" spellcheck="false"></textarea>
           <div class="pem-row">
             <button class="btn btn-ghost xs" onclick="copyPem('privKey')"><i class="fa-regular fa-copy"></i> Copy</button>
             <button class="btn btn-ghost xs" onclick="clearPem('privKey')"><i class="fa-regular fa-trash-can"></i> Clear</button>
             <button class="btn btn-ghost xs" onclick="importPem('privKey')"><i class="fa-solid fa-folder-open"></i> Import</button>
           </div>
         </div>
-
-        <!-- Private key status -->
-        <div class="key-status" id="privStatus">
+        <div class="key-status">
           <span>Private key</span>
           <span class="badge" id="privBadge">—</span>
         </div>
@@ -413,16 +341,16 @@
 
         <!-- Padding -->
         <div class="field">
-          <label>Padding Scheme</label>
-          <select id="padding" onchange="onPaddingChange()">
-            <option value="oaep-sha256">OAEP + SHA-256  (recommended)</option>
-            <option value="oaep-sha512">OAEP + SHA-512</option>
-            <option value="oaep-sha1">OAEP + SHA-1  (legacy)</option>
-            <option value="pkcs1v15">PKCS#1 v1.5  (legacy)</option>
+          <label>Padding Scheme / Hash</label>
+          <select id="padding" onchange="updateMaxSize()">
+            <option value="SHA-256">OAEP + SHA-256  (recommended)</option>
+            <option value="SHA-512">OAEP + SHA-512</option>
+            <option value="SHA-384">OAEP + SHA-384</option>
+            <option value="SHA-1">OAEP + SHA-1  (legacy)</option>
           </select>
         </div>
 
-        <!-- Max plaintext size indicator -->
+        <!-- Max plaintext -->
         <div class="info-bar">
           <span>Max plaintext</span>
           <span class="badge badge-inf" id="maxBadge">—</span>
@@ -432,11 +360,11 @@
 
         <!-- Decrypt / Encrypt -->
         <div class="act-row">
-          <button class="btn btn-dec" id="decBtn" onclick="doDecrypt()" title="Decrypt ciphertext → plaintext (Ctrl+D)">
+          <button class="btn btn-dec" id="decBtn" onclick="doDecrypt()">
             <i class="fa-solid fa-lock-open"></i> Decrypt
             <i class="fa-solid fa-arrow-right" style="font-size:11px"></i>
           </button>
-          <button class="btn btn-enc" id="encBtn" onclick="doEncrypt()" title="Encrypt plaintext → ciphertext (Ctrl+E)">
+          <button class="btn btn-enc" id="encBtn" onclick="doEncrypt()">
             <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
             <i class="fa-solid fa-lock"></i> Encrypt
           </button>
@@ -460,14 +388,12 @@
           </button>
         </div>
 
-      </div><!-- /ctrl-scroll -->
+      </div>
     </div>
 
-    <!-- ══ RIGHT: Plaintext ═══════════════════════════════════ -->
+    <!-- RIGHT: Plaintext -->
     <div class="panel">
-      <div class="panel-hdr">
-        <i class="fa-regular fa-file-lines"></i> PLAINTEXT
-      </div>
+      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> PLAINTEXT</div>
       <div class="toolbar">
         <button class="btn btn-ghost xs" onclick="copyText('pt')"><i class="fa-regular fa-copy"></i> Copy</button>
         <button class="btn btn-ghost xs" onclick="clearField('pt')"><i class="fa-regular fa-trash-can"></i> Clear</button>
@@ -484,449 +410,458 @@
       <textarea id="pt" placeholder="Type or paste plaintext to encrypt"></textarea>
     </div>
 
-  </div><!-- /layout -->
-</div><!-- /container -->
+  </div>
+</div>
 
-<!-- Hidden file input for PEM import -->
 <input type="file" id="fileInput" accept=".pem,.txt,.key,.crt,.cer" style="display:none" onchange="onFileSelected()">
 
 <script>
 'use strict';
 
-// ─── DOM helpers ──────────────────────────────────────────────────────────────
-var _fileTarget = null;
+/* ─── Require Web Crypto ─────────────────────────────────────────────────── */
+if (!window.crypto || !window.crypto.subtle) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;padding:20px"><div><h2 style="color:#ef4444">Web Crypto API not available</h2><p style="margin-top:8px;color:#64748b">This tool requires a secure context (HTTPS or localhost).<br>Please serve this file via a local server or HTTPS.</p></div></div>';
+  throw new Error('SubtleCrypto unavailable');
+}
+
+/* ─── Helpers ────────────────────────────────────────────────────────────── */
 var $ = function(id){ return document.getElementById(id); };
 function gv(id){ return $(id).value; }
-function sv(id, v){ $(id).value = v; }
+function sv(id,v){ $(id).value = v; }
 
-// ─── Parse PEM key (returns null on failure) ──────────────────────────────────
-function parsePubKey(pem) {
+/* ─── Encoding utilities ─────────────────────────────────────────────────── */
+function ab2hex(buf) {
+  return Array.from(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+function hex2ab(hex) {
+  hex = hex.replace(/\s/g,'');
+  var buf = new Uint8Array(hex.length / 2);
+  for (var i=0; i<buf.length; i++) buf[i] = parseInt(hex.slice(i*2,i*2+2),16);
+  return buf.buffer;
+}
+function ab2b64(buf) {
+  var bytes = new Uint8Array(buf), bin = '';
+  bytes.forEach(function(b){ bin += String.fromCharCode(b); });
+  return btoa(bin);
+}
+function b642ab(b64) {
+  var bin = atob(b64.replace(/\s/g,'')), buf = new Uint8Array(bin.length);
+  for (var i=0;i<bin.length;i++) buf[i] = bin.charCodeAt(i);
+  return buf.buffer;
+}
+var enc = new TextEncoder(), dec = new TextDecoder();
+
+/* ─── PEM helpers ────────────────────────────────────────────────────────── */
+// Strip PEM headers/footers and decode the base64 body to an ArrayBuffer
+function pemToAb(pem) {
+  var b64 = pem.trim()
+    .replace(/-----[A-Z ]+-----/g, '')
+    .replace(/\s/g, '');
+  return b642ab(b64);
+}
+
+// Detect PEM type: returns 'public', 'private', or null
+function pemType(pem) {
+  pem = pem.trim().toUpperCase();
+  if (pem.includes('PUBLIC KEY'))  return 'public';
+  if (pem.includes('PRIVATE KEY')) return 'private';
+  if (pem.includes('CERTIFICATE')) return 'certificate';
+  return null;
+}
+
+/* ─── Import keys via SubtleCrypto ──────────────────────────────────────── */
+// Returns a Promise<CryptoKey> or rejects with a descriptive error.
+function importPublicKey(pem, hash) {
   try {
-    if (!pem.trim()) return null;
-    if (pem.includes('CERTIFICATE'))
-      return forge.pki.certificateFromPem(pem).publicKey;
-    return forge.pki.publicKeyFromPem(pem.trim());
-  } catch(e) { return null; }
+    var der = pemToAb(pem);
+    return crypto.subtle.importKey(
+      'spki', der,
+      { name: 'RSA-OAEP', hash: { name: hash } },
+      true, ['encrypt']
+    );
+  } catch(e) {
+    return Promise.reject(new Error('Invalid public key PEM: ' + e.message));
+  }
 }
 
-function parsePrivKey(pem) {
+function importPrivateKey(pem, hash) {
   try {
-    if (!pem.trim()) return null;
-    if (pem.includes('ENCRYPTED'))
-      throw new Error('Encrypted private keys are not supported');
-    return forge.pki.privateKeyFromPem(pem.trim());
-  } catch(e) { return null; }
+    var der = pemToAb(pem);
+    // Try PKCS#8 first (BEGIN PRIVATE KEY), then fall back to PKCS#1 (BEGIN RSA PRIVATE KEY)
+    // SubtleCrypto only accepts PKCS#8 — if it's PKCS#1 we must prefix the PKCS#8 header
+    var format = pem.trim().toUpperCase().includes('RSA PRIVATE KEY') ? 'pkcs1' : 'pkcs8';
+    if (format === 'pkcs1') {
+      // Wrap RSA PKCS#1 in a PKCS#8 AlgorithmIdentifier envelope
+      der = wrapPkcs1InPkcs8(der);
+    }
+    return crypto.subtle.importKey(
+      'pkcs8', der,
+      { name: 'RSA-OAEP', hash: { name: hash } },
+      true, ['decrypt']
+    );
+  } catch(e) {
+    return Promise.reject(new Error('Invalid private key PEM: ' + e.message));
+  }
 }
 
-// ─── Key status badges ────────────────────────────────────────────────────────
-function updatePubBadge() {
-  var pem = gv('pubKey').trim();
-  var ta  = $('pubKey');
-  var bdg = $('pubBadge');
-  ta.classList.remove('pem-ok','pem-err');
-  if (!pem) { bdg.className = 'badge'; bdg.textContent = '—'; updateMaxSize(); return; }
-  var key = parsePubKey(pem);
-  if (key) {
-    var bits = key.n.bitLength();
-    ta.classList.add('pem-ok');
-    bdg.className = 'badge badge-ok';
-    bdg.textContent = 'RSA-' + bits + ' valid';
+// Wrap a PKCS#1 RSA private key DER blob in a PKCS#8 envelope so SubtleCrypto accepts it.
+// PKCS#8 = SEQUENCE { INTEGER 0, SEQUENCE { OID rsaEncryption, NULL }, OCTET STRING { pkcs1 } }
+function wrapPkcs1InPkcs8(pkcs1Der) {
+  var pkcs1 = new Uint8Array(pkcs1Der);
+  // RSA OID: 1.2.840.113549.1.1.1
+  var oid = new Uint8Array([0x30,0x0d,0x06,0x09,0x2a,0x86,0x48,0x86,0xf7,0x0d,0x01,0x01,0x01,0x05,0x00]);
+  var version = new Uint8Array([0x02,0x01,0x00]); // INTEGER 0
+
+  // OCTET STRING wrapping the PKCS#1 DER
+  var octet = tlv(0x04, pkcs1);
+  // Inner SEQUENCE: version + algorithmIdentifier + privateKey
+  var inner = concat([version, oid, octet]);
+  var outer = tlv(0x30, inner);
+  return outer.buffer;
+}
+
+function tlv(tag, content) {
+  var len = content.length;
+  var lenBytes;
+  if (len < 128) {
+    lenBytes = new Uint8Array([len]);
+  } else if (len < 256) {
+    lenBytes = new Uint8Array([0x81, len]);
   } else {
-    ta.classList.add('pem-err');
-    bdg.className = 'badge badge-err';
-    bdg.textContent = 'Invalid PEM';
+    lenBytes = new Uint8Array([0x82, (len >> 8) & 0xff, len & 0xff]);
   }
-  updateMaxSize();
+  return concat([new Uint8Array([tag]), lenBytes, content]);
 }
 
-function updatePrivBadge() {
-  var pem = gv('privKey').trim();
-  var ta  = $('privKey');
-  var bdg = $('privBadge');
-  ta.classList.remove('pem-ok','pem-err');
-  if (!pem) { bdg.className = 'badge'; bdg.textContent = '—'; return; }
-  var key = parsePrivKey(pem);
-  if (key) {
-    var bits = key.n.bitLength();
-    ta.classList.add('pem-ok');
-    bdg.className = 'badge badge-ok';
-    bdg.textContent = 'RSA-' + bits + ' valid';
-  } else {
-    ta.classList.add('pem-err');
-    bdg.className = 'badge badge-err';
-    bdg.textContent = 'Invalid PEM';
-  }
+function concat(arrays) {
+  var total = arrays.reduce(function(s,a){ return s + a.length; }, 0);
+  var out = new Uint8Array(total), off = 0;
+  arrays.forEach(function(a){ out.set(a, off); off += a.length; });
+  return out;
 }
 
-function onPubKeyInput()  { updatePubBadge(); }
-function onPrivKeyInput() { updatePrivBadge(); }
-
-// ─── Max plaintext size ───────────────────────────────────────────────────────
-// RSA can only encrypt limited bytes per operation
-// OAEP-SHA1:   maxBytes = keyBytes - 42
-// OAEP-SHA256: maxBytes = keyBytes - 66
-// OAEP-SHA512: maxBytes = keyBytes - 130
-// PKCS1v1.5:   maxBytes = keyBytes - 11
-function updateMaxSize() {
-  var b = $('maxBadge');
-  var pubPem = gv('pubKey').trim();
-  var pad    = gv('padding');
-  var ptFmt  = gv('ptFmt');
-
-  if (!pubPem) {
-    b.className = 'badge badge-inf'; b.textContent = '—'; return;
-  }
-  var key = parsePubKey(pubPem);
-  if (!key) { b.className = 'badge badge-err'; b.textContent = 'Invalid key'; return; }
-
-  var keyBytes = Math.floor(key.n.bitLength() / 8);
-  var overhead = pad === 'oaep-sha256' ? 66
-               : pad === 'oaep-sha512' ? 130
-               : pad === 'oaep-sha1'   ? 42
-               :                         11;  // pkcs1v15
-  var maxBytes = keyBytes - overhead;
-
-  // Adjust for plaintext encoding (base64 and hex represent more bytes per char)
-  var label;
-  if (ptFmt === 'utf8')   label = maxBytes + ' UTF-8 bytes';
-  else if (ptFmt === 'base64') label = Math.floor(maxBytes * 4/3) + ' base64 chars';
-  else                    label = maxBytes * 2 + ' hex chars';
-
-  b.className = 'badge badge-inf';
-  b.textContent = label;
-}
-
-function onPaddingChange() { updateMaxSize(); }
-
-// ─── Key generation ───────────────────────────────────────────────────────────
+/* ─── Key generation ─────────────────────────────────────────────────────── */
 var _generating = false;
 
 function setGenState(busy) {
   _generating = busy;
-  $('genBtnBig').disabled = busy;
-  $('genBtn').disabled    = busy;
-  $('genIcon').className  = busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-key';
+  $('genBtn').disabled = busy;
+  $('genIcon').className = busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-key';
   $('genLabel').textContent = busy ? 'Generating…' : 'Generate Key Pair';
 }
 
-function generateKeyPair() {
+// Export a CryptoKey to PEM string
+async function exportPem(key, type) {
+  var format = (type === 'public') ? 'spki' : 'pkcs8';
+  var header = (type === 'public') ? 'PUBLIC KEY' : 'PRIVATE KEY';
+  var der = await crypto.subtle.exportKey(format, key);
+  var b64 = ab2b64(der);
+  // Break into 64-char lines
+  var lines = [];
+  for (var i=0; i<b64.length; i+=64) lines.push(b64.slice(i, i+64));
+  return '-----BEGIN ' + header + '-----\n' + lines.join('\n') + '\n-----END ' + header + '-----';
+}
+
+async function generateKeyPair() {
   if (_generating) return;
-  if (typeof forge === 'undefined') {
-    showStatus('Crypto library failed to load — check your internet connection and reload', 'error');
-    return;
-  }
   var bits = parseInt(gv('keySize'));
+  var hash = gv('padding');
   setGenState(true);
   showStatus('Generating RSA-' + bits + ' key pair…', 'warn');
-
-  // Use setTimeout so the UI updates (spinner shows) before potentially blocking
-  setTimeout(function() {
-    try {
-      // Try async with workers first (non-blocking, works on http://)
-      forge.pki.rsa.generateKeyPair({ bits: bits, workers: -1, e: 0x10001 }, function(err, kp) {
-        if (err) { onGenError(err); return; }
-        onGenDone(kp, bits);
-      });
-    } catch(e) {
-      // Workers unavailable (e.g. file:// URL) — fall back to synchronous
-      try {
-        var kp = forge.pki.rsa.generateKeyPair({ bits: bits, e: 0x10001 });
-        onGenDone(kp, bits);
-      } catch(e2) { onGenError(e2); }
-    }
-  }, 30);
+  try {
+    var kp = await crypto.subtle.generateKey(
+      { name: 'RSA-OAEP', modulusLength: bits, publicExponent: new Uint8Array([1,0,1]), hash: { name: hash } },
+      true, ['encrypt', 'decrypt']
+    );
+    sv('pubKey',  await exportPem(kp.publicKey,  'public'));
+    sv('privKey', await exportPem(kp.privateKey, 'private'));
+    setGenState(false);
+    validatePubKey();
+    validatePrivKey();
+    showStatus('RSA-' + bits + ' key pair generated', 'success');
+  } catch(e) {
+    setGenState(false);
+    showStatus('Key generation failed: ' + e.message, 'error');
+    console.error(e);
+  }
 }
 
-function onGenDone(kp, bits) {
-  sv('pubKey',  forge.pki.publicKeyToPem(kp.publicKey));
-  sv('privKey', forge.pki.privateKeyToPem(kp.privateKey));
-  setGenState(false);
-  updatePubBadge();
-  updatePrivBadge();
-  showStatus('RSA-' + bits + ' key pair generated', 'success');
+/* ─── PEM validation (async, reads key size from the key itself) ─────────── */
+async function validatePubKey() {
+  var pem = gv('pubKey').trim();
+  var ta  = $('pubKey'), bdg = $('pubBadge');
+  ta.classList.remove('pem-ok','pem-err');
+  bdg.className = 'badge'; bdg.textContent = '—';
+  if (!pem) { updateMaxSize(); return; }
+  try {
+    var key = await importPublicKey(pem, gv('padding'));
+    var bits = (await crypto.subtle.exportKey('spki', key)).byteLength * 8;
+    // Actual modulus size: derive from the exported key length heuristic isn't perfect;
+    // get it properly from the JWK n parameter
+    var jwk = await crypto.subtle.exportKey('jwk', key);
+    bits = Math.floor(atob(jwk.n.replace(/-/g,'+').replace(/_/g,'/')).length * 8);
+    ta.classList.add('pem-ok');
+    bdg.className = 'badge badge-ok';
+    bdg.textContent = 'RSA-' + bits + ' valid';
+    updateMaxSize(bits);
+  } catch(e) {
+    ta.classList.add('pem-err');
+    bdg.className = 'badge badge-err';
+    bdg.textContent = 'Invalid PEM';
+    updateMaxSize();
+  }
 }
 
-function onGenError(e) {
-  setGenState(false);
-  showStatus('Key generation failed: ' + e.message, 'error');
-  console.error(e);
+async function validatePrivKey() {
+  var pem = gv('privKey').trim();
+  var ta  = $('privKey'), bdg = $('privBadge');
+  ta.classList.remove('pem-ok','pem-err');
+  bdg.className = 'badge'; bdg.textContent = '—';
+  if (!pem) return;
+  try {
+    var key = await importPrivateKey(pem, gv('padding'));
+    var jwk = await crypto.subtle.exportKey('jwk', key);
+    var bits = Math.floor(atob(jwk.n.replace(/-/g,'+').replace(/_/g,'/')).length * 8);
+    ta.classList.add('pem-ok');
+    bdg.className = 'badge badge-ok';
+    bdg.textContent = 'RSA-' + bits + ' valid';
+  } catch(e) {
+    ta.classList.add('pem-err');
+    bdg.className = 'badge badge-err';
+    bdg.textContent = 'Invalid PEM';
+  }
 }
 
-// ─── PEM helpers ─────────────────────────────────────────────────────────────
+/* ─── Max plaintext size ─────────────────────────────────────────────────── */
+// OAEP overhead = 2 + 2*hLen + 1 where hLen is the hash output in bytes
+var HASH_BYTES = { 'SHA-1': 20, 'SHA-256': 32, 'SHA-384': 48, 'SHA-512': 64 };
+
+function updateMaxSize(bits) {
+  var b = $('maxBadge');
+  if (!bits) { b.className = 'badge badge-inf'; b.textContent = '—'; return; }
+  var keyBytes = bits / 8;
+  var hLen     = HASH_BYTES[gv('padding')] || 32;
+  var maxBytes = keyBytes - 2 * hLen - 2;   // RSA-OAEP formula
+  var ptFmt    = gv('ptFmt');
+  var label;
+  if      (ptFmt === 'utf8')   label = maxBytes + ' bytes';
+  else if (ptFmt === 'base64') label = Math.ceil(maxBytes * 4/3) + ' base64 chars';
+  else                         label = (maxBytes * 2) + ' hex chars';
+  b.className = 'badge badge-inf';
+  b.textContent = label;
+}
+
+/* ─── Plaintext encoding / decoding ─────────────────────────────────────── */
+function ptToBytes(str, fmt) {
+  if (!str) throw new Error('Plaintext is empty');
+  if (fmt === 'utf8')   return enc.encode(str).buffer;
+  if (fmt === 'base64') return b642ab(str);
+  if (fmt === 'hex')    return hex2ab(str);
+  throw new Error('Unknown format');
+}
+
+function bytesToPt(buf, fmt) {
+  if (fmt === 'utf8')   return dec.decode(buf);
+  if (fmt === 'base64') return ab2b64(buf);
+  if (fmt === 'hex')    return ab2hex(buf);
+  throw new Error('Unknown format');
+}
+
+/* ─── Encrypt ────────────────────────────────────────────────────────────── */
+async function doEncrypt() {
+  try {
+    var pubPem = gv('pubKey').trim();
+    if (!pubPem) throw new Error('Public key is required for encryption');
+    var hash   = gv('padding');
+    var pubKey = await importPublicKey(pubPem, hash);
+    var ptBuf  = ptToBytes(gv('pt'), gv('ptFmt'));
+    var ctBuf  = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, pubKey, ptBuf);
+    sv('ct', gv('ctFmt') === 'base64' ? ab2b64(ctBuf) : ab2hex(ctBuf));
+    showStatus('Encryption successful', 'success');
+  } catch(e) {
+    var msg = e.message || 'Encryption failed';
+    if (msg.includes('DataError') || msg.includes('too large')) msg = 'Plaintext too large for this key size and padding';
+    showStatus(msg, 'error'); console.error(e);
+  }
+}
+
+/* ─── Decrypt ────────────────────────────────────────────────────────────── */
+async function doDecrypt() {
+  try {
+    var privPem = gv('privKey').trim();
+    if (!privPem) throw new Error('Private key is required for decryption');
+    var ct = gv('ct').trim();
+    if (!ct) throw new Error('Ciphertext is empty');
+    var hash    = gv('padding');
+    var privKey = await importPrivateKey(privPem, hash);
+    var ctBuf   = gv('ctFmt') === 'base64' ? b642ab(ct) : hex2ab(ct);
+    var ptBuf   = await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privKey, ctBuf);
+    sv('pt', bytesToPt(ptBuf, gv('ptFmt')));
+    showStatus('Decryption successful', 'success');
+  } catch(e) {
+    var msg = e.message || 'Decryption failed';
+    if (msg.includes('OperationError') || msg.includes('decryption'))
+      msg = 'Decryption failed — check private key, padding scheme and ciphertext format';
+    showStatus(msg, 'error'); console.error(e);
+  }
+}
+
+/* ─── PEM copy / clear / import ─────────────────────────────────────────── */
 function copyPem(id) {
   var v = gv(id);
   if (!v) { showStatus('Nothing to copy', 'warn'); return; }
-  (navigator.clipboard && navigator.clipboard.writeText(v)
-    ? navigator.clipboard.writeText(v)
-    : Promise.reject()
-  ).then(function(){ showStatus('Key copied to clipboard', 'success'); })
-   .catch(function(){ try { $(id).select(); document.execCommand('copy'); showStatus('Key copied to clipboard', 'success'); } catch(e){ showStatus('Copy failed', 'error'); } });
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(v) : Promise.reject())
+    .then(function(){ showStatus('Key copied', 'success'); })
+    .catch(function(){ try{ $(id).select(); document.execCommand('copy'); showStatus('Key copied','success'); } catch(e){ showStatus('Copy failed','error'); } });
 }
 
 function clearPem(id) {
-  sv(id, '');
-  if (id === 'pubKey')  updatePubBadge();
-  if (id === 'privKey') updatePrivBadge();
-  showStatus('Key cleared', 'success');
+  sv(id,'');
+  if (id==='pubKey')  validatePubKey();
+  if (id==='privKey') validatePrivKey();
+  showStatus('Key cleared','success');
 }
 
-function importPem(id) {
-  _fileTarget = id;
-  $('fileInput').value = '';
-  $('fileInput').click();
-}
-
+var _fileTarget = null;
+function importPem(id) { _fileTarget = id; $('fileInput').value = ''; $('fileInput').click(); }
 function onFileSelected() {
   var file = $('fileInput').files[0];
   if (!file || !_fileTarget) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    sv(_fileTarget, e.target.result);
-    if (_fileTarget === 'pubKey')  updatePubBadge();
-    if (_fileTarget === 'privKey') updatePrivBadge();
-    showStatus('Key imported from file', 'success');
+    sv(_fileTarget, e.target.result.trim());
+    if (_fileTarget==='pubKey')  validatePubKey();
+    if (_fileTarget==='privKey') validatePrivKey();
+    showStatus('Key imported from file','success');
   };
   reader.readAsText(file);
 }
 
-// ─── Encode / decode plaintext by format ──────────────────────────────────────
-// Returns a forge binary string ready for RSA encrypt
-function ptToBytes(str, fmt) {
-  if (!str) throw new Error('Plaintext is empty');
-  if (fmt === 'utf8')   return forge.util.encodeUtf8(str);
-  if (fmt === 'base64') return forge.util.decode64(str);
-  if (fmt === 'hex')    return forge.util.hexToBytes(str);
-  throw new Error('Unknown plaintext format');
-}
-
-// Converts forge binary string back to chosen format
-function bytesToPt(bytes, fmt) {
-  if (fmt === 'utf8')   return forge.util.decodeUtf8(bytes);
-  if (fmt === 'base64') return forge.util.encode64(bytes);
-  if (fmt === 'hex')    return forge.util.bytesToHex(bytes);
-  throw new Error('Unknown plaintext format');
-}
-
-// ─── Encryption ───────────────────────────────────────────────────────────────
-function getScheme(pad) {
-  if (pad === 'pkcs1v15') return 'RSAES-PKCS1-V1_5';
-  if (pad === 'oaep-sha1')   return { md: forge.md.sha1.create()   };
-  if (pad === 'oaep-sha256') return { md: forge.md.sha256.create() };
-  if (pad === 'oaep-sha512') return { md: forge.md.sha512.create() };
-  return { md: forge.md.sha256.create() };
-}
-
-function doEncrypt() {
-  try {
-    var pubPem = gv('pubKey').trim();
-    if (!pubPem) throw new Error('Public key is required for encryption');
-    var pubKey = parsePubKey(pubPem);
-    if (!pubKey) throw new Error('Public key is invalid — check PEM format');
-
-    var plain   = gv('pt');
-    var ptFmt   = gv('ptFmt');
-    var ctFmt   = gv('ctFmt');
-    var pad     = gv('padding');
-    var bytes   = ptToBytes(plain, ptFmt);
-
-    // Size check
-    var keyBytes = Math.floor(pubKey.n.bitLength() / 8);
-    var overhead = pad === 'oaep-sha256' ? 66 : pad === 'oaep-sha512' ? 130 : pad === 'oaep-sha1' ? 42 : 11;
-    if (bytes.length > keyBytes - overhead)
-      throw new Error('Plaintext too large (' + bytes.length + ' bytes). Max for RSA-' + pubKey.n.bitLength() + ' with this padding: ' + (keyBytes - overhead) + ' bytes');
-
-    var scheme   = getScheme(pad);
-    var encrypted;
-    if (pad === 'pkcs1v15') {
-      encrypted = pubKey.encrypt(bytes, 'RSAES-PKCS1-V1_5');
-    } else {
-      encrypted = pubKey.encrypt(bytes, 'RSA-OAEP', scheme);
-    }
-
-    sv('ct', ctFmt === 'base64' ? forge.util.encode64(encrypted) : forge.util.bytesToHex(encrypted));
-    showStatus('Encryption successful', 'success');
-  } catch(e) { showStatus(e.message, 'error'); console.error(e); }
-}
-
-// ─── Decryption ───────────────────────────────────────────────────────────────
-function doDecrypt() {
-  try {
-    var privPem = gv('privKey').trim();
-    if (!privPem) throw new Error('Private key is required for decryption');
-    var privKey = parsePrivKey(privPem);
-    if (!privKey) throw new Error('Private key is invalid — check PEM format');
-
-    var ct    = gv('ct').trim();
-    if (!ct)  throw new Error('Ciphertext is empty');
-    var ctFmt = gv('ctFmt');
-    var ptFmt = gv('ptFmt');
-    var pad   = gv('padding');
-
-    var ctBytes = ctFmt === 'base64' ? forge.util.decode64(ct) : forge.util.hexToBytes(ct);
-
-    var decrypted;
-    if (pad === 'pkcs1v15') {
-      decrypted = privKey.decrypt(ctBytes, 'RSAES-PKCS1-V1_5');
-    } else {
-      decrypted = privKey.decrypt(ctBytes, 'RSA-OAEP', getScheme(pad));
-    }
-
-    sv('pt', bytesToPt(decrypted, ptFmt));
-    showStatus('Decryption successful', 'success');
-  } catch(e) {
-    // Provide helpful error messages
-    var msg = e.message || 'Decryption failed';
-    if (msg.includes('OAEP') || msg.includes('invalid') || msg.includes('Unknown'))
-      msg = 'Decryption failed — check private key, padding scheme, and ciphertext format';
-    showStatus(msg, 'error'); console.error(e);
-  }
-}
-
-// ─── Swap panels ─────────────────────────────────────────────────────────────
+/* ─── Swap ───────────────────────────────────────────────────────────────── */
 function swapPanels() {
-  var a = gv('ct'), b = gv('pt'); sv('ct', b); sv('pt', a);
-  showStatus('Panels swapped', 'success');
+  var a=gv('ct'), b=gv('pt'); sv('ct',b); sv('pt',a);
+  showStatus('Panels swapped','success');
 }
 
-// ─── Clipboard / download ─────────────────────────────────────────────────────
+/* ─── Clipboard / download ───────────────────────────────────────────────── */
 function copyText(id) {
   var v = gv(id);
-  if (!v) { showStatus('Nothing to copy', 'warn'); return; }
-  var done = function(){ showStatus('Copied to clipboard', 'success'); };
-  var fail = function(){ try { $(id).select(); document.execCommand('copy'); done(); } catch(e){ showStatus('Copy failed','error'); } };
-  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(v) : Promise.reject())
-    .then(done).catch(fail);
+  if (!v) { showStatus('Nothing to copy','warn'); return; }
+  var ok=function(){ showStatus('Copied to clipboard','success'); };
+  var fail=function(){ try{ $(id).select(); document.execCommand('copy'); ok(); } catch(e){ showStatus('Copy failed','error'); } };
+  (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(v) : Promise.reject()).then(ok).catch(fail);
 }
-
 function clearField(id) { sv(id,''); showStatus('Cleared','success'); }
-
 function dlText(id, name) {
-  var v = gv(id);
+  var v=gv(id);
   if (!v) { showStatus('Nothing to save','warn'); return; }
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([v],{type:'text/plain'}));
-  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([v],{type:'text/plain'}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
   showStatus('Download started','success');
 }
 
-// ─── Status ───────────────────────────────────────────────────────────────────
+/* ─── Status ─────────────────────────────────────────────────────────────── */
 var _st;
-function showStatus(msg, type) {
-  type = type || 'success';
-  var s = $('status');
-  s.textContent = msg; s.className = 'status ' + type; s.style.display = 'block';
-  clearTimeout(_st); _st = setTimeout(function(){ s.style.display = 'none'; }, 4000);
+function showStatus(msg,type) {
+  type = type||'success';
+  var s=$('status');
+  s.textContent=msg; s.className='status '+type; s.style.display='block';
+  clearTimeout(_st); _st=setTimeout(function(){ s.style.display='none'; },4000);
 }
 
-// ─── Share URL  ───────────────────────────────────────────────────────────────
+/* ─── Share URL ──────────────────────────────────────────────────────────── */
 function b64uEnc(str) {
-  var bytes = new TextEncoder().encode(str);
-  var bin = ''; bytes.forEach(function(b){ bin += String.fromCharCode(b); });
+  var bytes=new TextEncoder().encode(str), bin='';
+  bytes.forEach(function(b){ bin+=String.fromCharCode(b); });
   return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 }
 function b64uDec(str) {
-  str = str.replace(/-/g,'+').replace(/_/g,'/');
-  while (str.length % 4) str += '=';
-  var bin = atob(str);
-  var bytes = new Uint8Array(bin.length);
-  for (var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  str=str.replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length%4) str+='=';
+  var bin=atob(str), bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
   return new TextDecoder().decode(bytes);
 }
 
 function shareConfig() {
   var state = {
-    v:       1,
-    keySize: gv('keySize'),
-    padding: gv('padding'),
-    ctFmt:   gv('ctFmt'),
-    ptFmt:   gv('ptFmt'),
-    pubKey:  gv('pubKey'),
-    privKey: gv('privKey'),
-    ct:      gv('ct'),
-    pt:      gv('pt')
+    v:1, keySize:gv('keySize'), padding:gv('padding'),
+    ctFmt:gv('ctFmt'), ptFmt:gv('ptFmt'),
+    pubKey:gv('pubKey'), privKey:gv('privKey'),
+    ct:gv('ct'), pt:gv('pt')
   };
   try {
-    var encoded = b64uEnc(JSON.stringify(state));
-    var url = window.location.href.split('#')[0] + '#s=' + encoded;
-    var done = function(){ showStatus('Share URL copied to clipboard', 'success'); };
+    var url = window.location.href.split('#')[0] + '#s=' + b64uEnc(JSON.stringify(state));
+    var ok=function(){ showStatus('Share URL copied to clipboard','success'); };
     (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(url) : Promise.reject())
-      .then(done).catch(function(){ fallbackCopy(url); });
-  } catch(e) { showStatus('Could not generate URL', 'error'); }
-}
-
-function fallbackCopy(text) {
-  var ta = document.createElement('textarea');
-  ta.value = text; ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
-  document.body.appendChild(ta); ta.focus(); ta.select();
-  try { document.execCommand('copy'); showStatus('Share URL copied to clipboard', 'success'); }
-  catch(e) { prompt('Copy this URL:', text); }
-  document.body.removeChild(ta);
+      .then(ok).catch(function(){ try{
+        var ta=document.createElement('textarea'); ta.value=url;
+        ta.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0';
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        document.execCommand('copy'); ok();
+        document.body.removeChild(ta);
+      }catch(e){ prompt('Copy this URL:',url); }});
+  } catch(e) { showStatus('Could not generate URL','error'); }
 }
 
 function loadFromHash() {
-  var hash = window.location.hash;
-  if (!hash || hash.indexOf('s=') === -1) return;
+  var hash=window.location.hash;
+  if (!hash||hash.indexOf('s=')===-1) return;
   try {
-    var params = new URLSearchParams(hash.slice(1));
-    var enc = params.get('s');
-    if (!enc) return;
-    var state = JSON.parse(b64uDec(enc));
-    if (state.keySize) sv('keySize', state.keySize);
-    if (state.padding) sv('padding', state.padding);
-    if (state.ctFmt)   sv('ctFmt',   state.ctFmt);
-    if (state.ptFmt)   sv('ptFmt',   state.ptFmt);
-    if (state.pubKey  !== undefined) sv('pubKey',  state.pubKey);
-    if (state.privKey !== undefined) sv('privKey', state.privKey);
-    if (state.ct      !== undefined) sv('ct',      state.ct);
-    if (state.pt      !== undefined) sv('pt',      state.pt);
-    updatePubBadge();
-    updatePrivBadge();
-    showStatus('Configuration and data loaded from URL', 'success');
-  } catch(e) { console.warn('loadFromHash failed:', e); }
+    var enc2=new URLSearchParams(hash.slice(1)).get('s');
+    if (!enc2) return;
+    var state=JSON.parse(b64uDec(enc2));
+    if(state.keySize) sv('keySize',state.keySize);
+    if(state.padding) sv('padding',state.padding);
+    if(state.ctFmt)   sv('ctFmt',  state.ctFmt);
+    if(state.ptFmt)   sv('ptFmt',  state.ptFmt);
+    if(state.pubKey  !==undefined) sv('pubKey',  state.pubKey);
+    if(state.privKey !==undefined) sv('privKey', state.privKey);
+    if(state.ct      !==undefined) sv('ct',      state.ct);
+    if(state.pt      !==undefined) sv('pt',      state.pt);
+    validatePubKey(); validatePrivKey();
+    showStatus('Configuration and data loaded from URL','success');
+  } catch(e){ console.warn('loadFromHash failed:',e); }
 }
 
-// ─── Reset ────────────────────────────────────────────────────────────────────
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
 function resetAll() {
-  if (!confirm('Reset all fields and settings?')) return;
+  if(!confirm('Reset all fields and settings?')) return;
   ['ct','pt','pubKey','privKey'].forEach(function(id){ sv(id,''); });
-  sv('keySize','2048'); sv('padding','oaep-sha256');
+  sv('keySize','2048'); sv('padding','SHA-256');
   sv('ctFmt','base64'); sv('ptFmt','utf8');
-  try { history.replaceState(null,'', location.pathname + location.search); } catch(e){}
-  updatePubBadge(); updatePrivBadge();
-  showStatus('Reset complete', 'success');
+  try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+  validatePubKey(); validatePrivKey();
+  showStatus('Reset complete','success');
 }
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
+/* ─── Theme ──────────────────────────────────────────────────────────────── */
 function toggleTheme() {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('rsa-theme', next);
-  applyThemeIcon(next);
-}
-function applyThemeIcon(t) {
-  $('themeIcon').className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+  var next = document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('rsa-theme',next);
+  $('themeIcon').className = next==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';
 }
 function loadTheme() {
-  var t = localStorage.getItem('rsa-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', t);
-  applyThemeIcon(t);
+  var t=localStorage.getItem('rsa-theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  $('themeIcon').className = t==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';
 }
 
-// ─── Keyboard shortcuts ───────────────────────────────────────────────────────
+/* ─── Keyboard shortcuts ─────────────────────────────────────────────────── */
 document.addEventListener('keydown', function(e) {
-  if (!(e.ctrlKey || e.metaKey)) return;
-  var k = e.key.toLowerCase();
-  if (k==='e') { e.preventDefault(); doEncrypt(); }
-  if (k==='d') { e.preventDefault(); doDecrypt(); }
-  if (k==='r') { e.preventDefault(); resetAll();  }
+  if(!(e.ctrlKey||e.metaKey)) return;
+  if(e.key.toLowerCase()==='e'){ e.preventDefault(); doEncrypt(); }
+  if(e.key.toLowerCase()==='d'){ e.preventDefault(); doDecrypt(); }
+  if(e.key.toLowerCase()==='r'){ e.preventDefault(); resetAll();  }
 });
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+/* ─── Init ───────────────────────────────────────────────────────────────── */
 loadTheme();
 loadFromHash();
-updatePubBadge();
-updatePrivBadge();
-updateMaxSize();
+validatePubKey();
+validatePrivKey();
 window.addEventListener('hashchange', loadFromHash);
 </script>
 </body>
