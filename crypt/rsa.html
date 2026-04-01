@@ -27,11 +27,13 @@
       --bdr:   #30363d;  --shd:   rgba(0,0,0,.4);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { overflow-x: hidden; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-size: 14.5px; background: var(--bg); color: var(--txt);
       padding: 10px 14px; line-height: 1.5;
       transition: background .25s, color .25s;
+      overflow-x: hidden;
     }
 
     /* Header */
@@ -95,6 +97,14 @@
     .tb-sep  { width: 1px; height: 14px; background: var(--bdr); flex-shrink: 0; margin: 0 2px; }
     .tb-fill { flex: 1; min-width: 0; }
     .tb-label { font-size: 12px; color: var(--txt); white-space: nowrap; flex-shrink: 0; font-weight: 700; }
+    @media (max-width: 600px) {
+      .toolbar { gap: 4px; }
+      .toolbar .btn-text { display: none; }
+      .btn.xs { padding: 4px 7px; font-size: 12px; }
+      .swap-btn .swap-text { display: none; }
+      .swap-btn { padding: 4px 7px; }
+      .tb-sep { display: none; }
+    }
 
     /* Main textareas (ciphertext / plaintext) */
     textarea {
@@ -238,7 +248,7 @@
       .panel  { height: auto; max-height: none; min-height: 260px; }
       textarea { min-height: 150px; }
     }
-    @media (max-width: 600px) { body { padding: 6px 8px; } h1 { font-size: 17px; } }
+    @media (max-width: 600px) { body { padding: 6px 8px; } h1 { font-size: 16px; } }
   </style>
 </head>
 <body>
@@ -264,9 +274,9 @@
     <div class="panel">
       <div class="panel-hdr"><i class="fa-solid fa-lock"></i> CIPHERTEXT</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('ct')"><i class="fa-regular fa-copy"></i> Copy</button>
-        <button class="btn btn-ghost xs" onclick="clearField('ct')"><i class="fa-regular fa-trash-can"></i> Clear</button>
-        <button class="btn btn-ghost xs" onclick="dlText('ct','ciphertext.txt')"><i class="fa-solid fa-download"></i> Save</button>
+        <button class="btn btn-ghost xs" onclick="copyText('ct')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('ct')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('ct','ciphertext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-sep"></div>
         <span class="tb-label">Format</span>
         <select class="sm" id="ctFmt">
@@ -274,7 +284,7 @@
           <option value="hex">Hex</option>
         </select>
         <div class="tb-fill"></div>
-        <button class="swap-btn" onclick="swapPanels()"><i class="fa-solid fa-right-left"></i> Swap</button>
+        <button class="swap-btn" onclick="swapPanels()"><i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span></button>
       </div>
       <textarea id="ct" placeholder="Paste ciphertext here to decrypt"></textarea>
     </div>
@@ -310,8 +320,8 @@
             placeholder="-----BEGIN PUBLIC KEY-----&#10;Paste public key here&#10;-----END PUBLIC KEY-----"
             oninput="validatePubKey()" spellcheck="false"></textarea>
           <div class="pem-row">
-            <button class="btn btn-ghost xs" onclick="copyPem('pubKey')"><i class="fa-regular fa-copy"></i> Copy</button>
-            <button class="btn btn-ghost xs" onclick="clearPem('pubKey')"><i class="fa-regular fa-trash-can"></i> Clear</button>
+            <button class="btn btn-ghost xs" onclick="copyPem('pubKey')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+            <button class="btn btn-ghost xs" onclick="clearPem('pubKey')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
             <button class="btn btn-ghost xs" onclick="importPem('pubKey')"><i class="fa-solid fa-folder-open"></i> Import</button>
           </div>
         </div>
@@ -327,8 +337,8 @@
             placeholder="-----BEGIN PRIVATE KEY-----&#10;Paste private key here&#10;-----END PRIVATE KEY-----"
             oninput="validatePrivKey()" spellcheck="false"></textarea>
           <div class="pem-row">
-            <button class="btn btn-ghost xs" onclick="copyPem('privKey')"><i class="fa-regular fa-copy"></i> Copy</button>
-            <button class="btn btn-ghost xs" onclick="clearPem('privKey')"><i class="fa-regular fa-trash-can"></i> Clear</button>
+            <button class="btn btn-ghost xs" onclick="copyPem('privKey')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+            <button class="btn btn-ghost xs" onclick="clearPem('privKey')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
             <button class="btn btn-ghost xs" onclick="importPem('privKey')"><i class="fa-solid fa-folder-open"></i> Import</button>
           </div>
         </div>
@@ -395,9 +405,9 @@
     <div class="panel">
       <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> PLAINTEXT</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('pt')"><i class="fa-regular fa-copy"></i> Copy</button>
-        <button class="btn btn-ghost xs" onclick="clearField('pt')"><i class="fa-regular fa-trash-can"></i> Clear</button>
-        <button class="btn btn-ghost xs" onclick="dlText('pt','plaintext.txt')"><i class="fa-solid fa-download"></i> Save</button>
+        <button class="btn btn-ghost xs" onclick="copyText('pt')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('pt')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('pt','plaintext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-sep"></div>
         <span class="tb-label">Format</span>
         <select class="sm" id="ptFmt" onchange="updateMaxSize()">

@@ -33,6 +33,7 @@
       --shd:   rgba(0,0,0,.4);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { overflow-x: hidden; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -40,6 +41,7 @@
       background: var(--bg); color: var(--txt);
       padding: 10px 14px; line-height: 1.5;
       transition: background .25s, color .25s;
+      overflow-x: hidden;
     }
 
     /* ─── Header ─────────────────────────────────────────── */
@@ -103,14 +105,23 @@
     }
     .panel-hdr i { font-size: 13px; color: var(--muted); }
 
-    /* ─── Toolbar: single line ────────────────────────────── */
+    /* ─── Toolbar ────────────────────────────────────────── */
     .toolbar {
       display: flex; align-items: center; gap: 5px;
-      flex-wrap: nowrap;
+      flex-wrap: nowrap;   /* stays one line on desktop */
     }
     .tb-sep { width: 1px; height: 14px; background: var(--bdr); flex-shrink: 0; margin: 0 2px; }
     .tb-fill { flex: 1; min-width: 0; }
     .tb-label { font-size: 12px; color: var(--txt); white-space: nowrap; flex-shrink: 0; font-weight: 700; }
+    /* On mobile: hide text labels on toolbar buttons, keep icons only */
+    @media (max-width: 600px) {
+      .toolbar { gap: 4px; }
+      .toolbar .btn-text { display: none; }
+      .btn.xs { padding: 4px 7px; font-size: 12px; }
+      .swap-btn .swap-text { display: none; }
+      .swap-btn { padding: 4px 7px; }
+      .tb-sep { display: none; }
+    }
 
     /* ─── Textarea ────────────────────────────────────────── */
     textarea {
@@ -276,7 +287,7 @@
     }
     @media (max-width: 600px) {
       body { padding: 6px 8px; }
-      h1   { font-size: 17px; }
+      h1   { font-size: 16px; }
     }
   </style>
 </head>
@@ -307,13 +318,13 @@
       </div>
       <div class="toolbar">
         <button class="btn btn-ghost xs" onclick="copyText('ct')" title="Copy">
-          <i class="fa-regular fa-copy"></i> Copy
+          <i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span>
         </button>
         <button class="btn btn-ghost xs" onclick="clearField('ct')" title="Clear">
-          <i class="fa-regular fa-trash-can"></i> Clear
+          <i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span>
         </button>
         <button class="btn btn-ghost xs" onclick="dlText('ct','ciphertext.txt')" title="Download">
-          <i class="fa-solid fa-download"></i> Save
+          <i class="fa-solid fa-download"></i><span class="btn-text"> Save</span>
         </button>
         <div class="tb-sep"></div>
         <span class="tb-label">Format</span>
@@ -323,7 +334,7 @@
         </select>
         <div class="tb-fill"></div>
         <button class="swap-btn" onclick="swapPanels()" title="Swap ciphertext and plaintext">
-          <i class="fa-solid fa-right-left"></i> Swap
+          <i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span>
         </button>
       </div>
       <textarea id="ct" placeholder="Paste ciphertext here to decrypt"></textarea>
@@ -447,13 +458,13 @@
       </div>
       <div class="toolbar">
         <button class="btn btn-ghost xs" onclick="copyText('pt')">
-          <i class="fa-regular fa-copy"></i> Copy
+          <i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span>
         </button>
         <button class="btn btn-ghost xs" onclick="clearField('pt')">
-          <i class="fa-regular fa-trash-can"></i> Clear
+          <i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span>
         </button>
         <button class="btn btn-ghost xs" onclick="dlText('pt','plaintext.txt')">
-          <i class="fa-solid fa-download"></i> Save
+          <i class="fa-solid fa-download"></i><span class="btn-text"> Save</span>
         </button>
         <div class="tb-sep"></div>
         <span class="tb-label">Format</span>
