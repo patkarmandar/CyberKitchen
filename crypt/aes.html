@@ -45,11 +45,23 @@
     /* ─── Header ─────────────────────────────────────────── */
     .container { max-width: 1800px; margin: 0 auto; }
 
+    /* Grid header: [left 1fr] [title auto] [right 1fr]
+       Grid guarantees the title is always exactly centered regardless of
+       side-element widths, and nothing can ever overlap. */
     header {
-      display: flex; align-items: center; justify-content: center;
-      position: relative; margin-bottom: 10px; min-height: 38px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      margin-bottom: 10px; min-height: 38px;
     }
+    .hdr-left  { display: flex; align-items: center; justify-content: flex-start; min-width: 0; }
+    .hdr-right { display: flex; align-items: center; justify-content: flex-end; gap: 6px; min-width: 0; }
     h1 {
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 8px;
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -.3px;
@@ -57,7 +69,6 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hdr-right { position: absolute; right: 0; display: flex; gap: 6px; align-items: center; }
 
     .icon-btn {
       width: 34px; height: 34px; border-radius: 8px;
@@ -240,19 +251,24 @@
     @keyframes pop { from { opacity:0; transform:scale(.97); } to { opacity:1; transform:scale(1); } }
 
     /* ─── CyberKitchen back link ──────────────────────────── */
-    .hdr-left { position: absolute; left: 0; display: flex; align-items: center; }
     .home-link {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 12px; font-weight: 600; color: var(--muted);
       text-decoration: none; padding: 5px 10px;
       border: 1px solid var(--bdr); border-radius: 7px;
       background: var(--surf); transition: all .18s;
+      white-space: nowrap; overflow: hidden; min-width: 0;
     }
     .home-link:hover {
       color: var(--acc); border-color: var(--acc);
       background: var(--inset);
     }
-    .home-link i { font-size: 12px; }
+    .home-link i { font-size: 12px; flex-shrink: 0; }
+    /* Hide the text label on small screens — keep only icons */
+    @media (max-width: 540px) {
+      .home-link .link-text { display: none; }
+      .home-link { padding: 5px 8px; gap: 4px; }
+    }
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       .panel  { height: auto; max-height: none; min-height: 260px; }
@@ -260,7 +276,7 @@
     }
     @media (max-width: 600px) {
       body { padding: 6px 8px; }
-      h1   { font-size: 18px; }
+      h1   { font-size: 17px; }
     }
   </style>
 </head>
@@ -271,7 +287,7 @@
     <div class="hdr-left">
       <a href="/CyberKitchen" class="home-link" title="Back to CyberKitchen">
         <i class="fa-solid fa-arrow-left"></i>
-        CyberKitchen
+        <span class="link-text">CyberKitchen</span>
       </a>
     </div>
     <h1>AES Encrypt / Decrypt</h1>
