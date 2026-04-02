@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encoder / Decoder — CyberKitchen</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css'">
+  <style>
+    :root {
+      --bg:#f8fafc; --surf:#ffffff; --inset:#f1f5f9; --inset2:#e4eaf1;
+      --txt:#0f172a; --muted:#64748b; --acc:#3b82f6; --ok:#10b981;
+      --err:#ef4444; --warn:#f59e0b; --bdr:#e2e8f0; --shd:rgba(0,0,0,.07);
+    }
+    [data-theme="dark"] {
+      --bg:#0d1117; --surf:#161b22; --inset:#21262d; --inset2:#2d333b;
+      --txt:#e6edf3; --muted:#8b949e; --bdr:#30363d; --shd:rgba(0,0,0,.4);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { overflow-x:hidden; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      font-size:14.5px; background:var(--bg); color:var(--txt);
+      padding:10px 14px; line-height:1.5;
+      transition:background .25s,color .25s; overflow-x:hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .container { max-width:1800px; margin:0 auto; }
+    header {
+      display:grid; grid-template-columns:1fr auto 1fr;
+      align-items:center; margin-bottom:10px; min-height:38px;
+    }
+    .hdr-left  { display:flex; align-items:center; justify-content:flex-start; min-width:0; }
+    .hdr-right { display:flex; align-items:center; justify-content:flex-end; gap:6px; min-width:0; }
+    h1 {
+      text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 8px;
+      font-size:22px; font-weight:800; letter-spacing:-.3px;
+      background:linear-gradient(130deg,#f59e0b 0%,#ef4444 40%,#8b5cf6 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .home-link {
+      display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+      color:var(--muted); text-decoration:none; padding:5px 10px;
+      border:1px solid var(--bdr); border-radius:7px; background:var(--surf);
+      transition:all .18s; white-space:nowrap;
+    }
+    .home-link:hover { color:var(--acc); border-color:var(--acc); background:var(--inset); }
+    .home-link i { font-size:12px; flex-shrink:0; }
+    .icon-btn {
+      width:34px; height:34px; border-radius:8px; background:var(--surf);
+      border:1px solid var(--bdr); cursor:pointer; display:flex; align-items:center;
+      justify-content:center; color:var(--muted); font-size:14px; transition:all .2s;
+    }
+    .icon-btn:hover { border-color:var(--acc); color:var(--acc); transform:scale(1.08); }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .layout { display:grid; grid-template-columns:1fr 320px 1fr; gap:10px; }
+    .panel {
+      background:var(--surf); border:1px solid var(--bdr); border-radius:10px;
+      padding:12px; box-shadow:0 1px 4px var(--shd);
+      display:flex; flex-direction:column; gap:8px;
+      height:calc(100vh - 70px); min-height:480px; max-height:800px;
+    }
+    .panel-hdr {
+      font-size:13px; font-weight:700; letter-spacing:.03em;
+      color:var(--txt); display:flex; align-items:center; gap:6px; flex-shrink:0;
+    }
+    .panel-hdr i { font-size:13px; color:var(--muted); }
+
+    /* ── Toolbar ─────────────────────────────────────────── */
+    .toolbar { display:flex; align-items:center; gap:5px; flex-wrap:nowrap; flex-shrink:0; }
+    .tb-sep  { width:1px; height:14px; background:var(--bdr); flex-shrink:0; margin:0 2px; }
+    .tb-fill { flex:1; min-width:0; }
+    .tb-label { font-size:12px; color:var(--txt); white-space:nowrap; flex-shrink:0; font-weight:700; }
+    @media (max-width:600px) {
+      .toolbar { gap:4px; }
+      .toolbar .btn-text { display:none; }
+      .swap-btn .swap-text { display:none; }
+      .swap-btn { padding:4px 7px; }
+      .tb-sep { display:none; }
+      .btn.xs { padding:4px 7px; }
+    }
+
+    /* ── Textareas ───────────────────────────────────────── */
+    textarea {
+      flex:1; width:100%; resize:none; min-height:0;
+      padding:9px 10px;
+      font-family:'SF Mono','Fira Code','Menlo','Consolas',monospace;
+      font-size:14px; line-height:1.65; background:var(--inset); color:var(--txt);
+      border:1px solid var(--bdr); border-radius:7px;
+      outline:none !important; box-shadow:none !important; transition:border-color .18s;
+    }
+    textarea:focus { border-color:var(--acc); }
+    textarea::placeholder { color:var(--muted); opacity:.55; font-style:italic; }
+    textarea::-webkit-scrollbar { width:6px; }
+    textarea::-webkit-scrollbar-thumb { background:var(--bdr); border-radius:3px; }
+    textarea.verify-match { border-color:var(--ok) !important; background:rgba(16,185,129,.05) !important; }
+    textarea.verify-fail  { border-color:var(--err) !important; background:rgba(239,68,68,.05) !important; }
+
+    /* ── Controls ────────────────────────────────────────── */
+    .ctrl-scroll {
+      flex:1; display:flex; flex-direction:column; gap:7px;
+      overflow-y:auto; min-height:0; padding-right:2px;
+    }
+    .ctrl-scroll::-webkit-scrollbar { width:4px; }
+    .ctrl-scroll::-webkit-scrollbar-thumb { background:var(--bdr); border-radius:2px; }
+    .field { display:flex; flex-direction:column; gap:3px; }
+    .field > label { font-size:12px; font-weight:600; color:var(--muted); }
+
+    /* ── Inputs & selects ────────────────────────────────── */
+    input[type="text"], input[type="number"], select {
+      background:var(--inset); color:var(--txt); border:1px solid var(--bdr);
+      border-radius:6px; padding:6px 8px; font-size:13px;
+      outline:none !important; box-shadow:none !important;
+      transition:border-color .18s,background .18s; width:100%;
+      -webkit-appearance:none; appearance:none;
+    }
+    input:valid, input:invalid, input:-webkit-autofill,
+    input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+      border-color:var(--bdr) !important; box-shadow:none !important; outline:none !important;
+    }
+    input:focus, select:focus { border-color:var(--acc); background:var(--bg); }
+    select.sm { padding:5px 5px; font-size:12px; border-radius:5px; cursor:pointer; flex-shrink:0; width:auto; }
+    input.inp-sm { padding:5px 7px; font-size:12px; border-radius:5px; }
+
+    /* ── Encoding buttons grid ───────────────────────────── */
+    .enc-group { display:flex; flex-direction:column; gap:4px; }
+    .enc-group-label {
+      font-size:10px; font-weight:700; color:var(--muted);
+      letter-spacing:.06em; text-transform:uppercase; padding-left:2px;
+    }
+    .enc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+    .enc-btn {
+      padding:5px 4px; border:1px solid var(--bdr); border-radius:6px;
+      background:var(--inset); color:var(--muted); font-size:11px; font-weight:600;
+      cursor:pointer; text-align:center; transition:all .15s; white-space:nowrap;
+      line-height:1.3;
+    }
+    .enc-btn:hover { background:var(--inset2); color:var(--txt); border-color:var(--muted); }
+    .enc-btn.active { background:var(--acc); color:#fff; border-color:var(--acc); }
+
+    /* ── Info bar ────────────────────────────────────────── */
+    .info-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--inset); border:1px solid var(--bdr);
+      border-radius:6px; padding:4px 9px; font-size:11px; color:var(--muted);
+    }
+    .badge {
+      font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+      letter-spacing:.04em; background:var(--inset2); color:var(--muted);
+    }
+    .badge-ok   { background:rgba(16,185,129,.15); color:#10b981; }
+    .badge-err  { background:rgba(239,68,68,.15);  color:var(--err); }
+    .badge-inf  { background:rgba(59,130,246,.15);  color:#3b82f6; }
+    .badge-warn { background:rgba(245,158,11,.15);  color:var(--warn); }
+
+    /* ── Extra options row ───────────────────────────────── */
+    .opt-row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .opt-row label { font-size:11px; color:var(--muted); font-weight:600; flex-shrink:0; }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn {
+      border:none; border-radius:6px; font-weight:400; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center; gap:5px;
+      transition:all .16s; white-space:nowrap; flex-shrink:0; font-size:12px;
+    }
+    .btn:active { transform:scale(.95); }
+    .btn.xs { padding:4px 8px; font-size:12px; }
+    .btn.sm { padding:5px 10px; font-size:13px; }
+    .btn-ghost { background:var(--inset); color:var(--txt); border:1px solid var(--bdr); }
+    .btn-ghost:hover { background:var(--inset2); }
+
+    .btn-encode {
+      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
+      background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+      border:none; border-radius:6px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .18s;
+    }
+    .btn-decode {
+      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
+      background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
+      border:none; border-radius:6px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .18s;
+    }
+    .btn-encode:hover, .btn-decode:hover {
+      filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 12px var(--shd);
+    }
+    .swap-btn {
+      background:transparent; border:1px solid var(--bdr); color:var(--muted);
+      border-radius:6px; padding:4px 8px; cursor:pointer; flex-shrink:0; font-size:13px;
+      display:inline-flex; align-items:center; gap:4px; transition:all .18s;
+    }
+    .swap-btn:hover { color:var(--acc); border-color:var(--acc); }
+    .act-row { display:flex; gap:7px; }
+    .bot-row { display:flex; gap:6px; }
+    .divider { height:1px; background:var(--bdr); flex-shrink:0; }
+    .spacer  { flex:1; min-height:2px; }
+
+    /* ── Status ──────────────────────────────────────────── */
+    .status {
+      padding:6px 10px; border-radius:6px; font-size:13px;
+      display:none; flex-shrink:0; animation:pop .2s ease;
+    }
+    .status.success { background:rgba(16,185,129,.12); color:var(--ok);   border:1px solid rgba(16,185,129,.25); }
+    .status.error   { background:rgba(239,68,68,.12);  color:var(--err);  border:1px solid rgba(239,68,68,.25); }
+    .status.warn    { background:rgba(245,158,11,.12); color:var(--warn); border:1px solid rgba(245,158,11,.25); }
+    @keyframes pop { from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)} }
+
+    /* ── Auto-detect chip ────────────────────────────────── */
+    .detect-chip {
+      display:inline-flex; align-items:center; gap:5px; font-size:11px;
+      padding:3px 8px; border-radius:20px; cursor:pointer;
+      background:var(--inset2); border:1px solid var(--bdr);
+      color:var(--muted); transition:all .18s; flex-shrink:0;
+    }
+    .detect-chip:hover { border-color:var(--acc); color:var(--acc); }
+    .detect-chip i { font-size:10px; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width:1100px) {
+      .layout { grid-template-columns:1fr; }
+      .panel  { height:auto; max-height:none; min-height:240px; }
+      textarea { min-height:140px; }
+    }
+    @media (max-width:540px) {
+      .home-link .link-text { display:none; }
+      .home-link { padding:5px 8px; gap:4px; }
+    }
+    @media (max-width:600px) {
+      body { padding:6px 8px; } h1 { font-size:16px; }
+      .enc-grid { grid-template-columns:repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="hdr-left">
+      <a href="/CyberKitchen" class="home-link" title="Back to CyberKitchen">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span class="link-text">CyberKitchen</span>
+      </a>
+    </div>
+    <h1>Encoder / Decoder</h1>
+    <div class="hdr-right">
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ══ LEFT: Decoded / Plain ═══════════════════════════ -->
+    <div class="panel">
+      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> DECODED / PLAIN</div>
+      <div class="toolbar">
+        <button class="btn btn-ghost xs" onclick="copyText('inputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('inputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('inputData','decoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <div class="tb-fill"></div>
+        <button class="swap-btn" onclick="swapPanels()">
+          <i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span>
+        </button>
+      </div>
+      <textarea id="inputData" placeholder="Enter plain / decoded data here"></textarea>
+    </div>
+
+    <!-- ══ MIDDLE: Configuration ════════════════════════════ -->
+    <div class="panel">
+      <div class="panel-hdr"><i class="fa-solid fa-gear"></i> CONFIGURATION</div>
+      <div class="ctrl-scroll">
+
+        <!-- Encoding groups -->
+        <div class="enc-group">
+          <div class="enc-group-label">Common</div>
+          <div class="enc-grid" id="encGrid"><!-- JS fills this --></div>
+        </div>
+
+        <!-- Encoding info -->
+        <div class="info-bar">
+          <span id="encInfo" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+          <span class="badge badge-inf" id="encBadge">—</span>
+        </div>
+
+        <!-- Per-encoding options (shown/hidden per selection) -->
+        <div id="optCaesar" style="display:none">
+          <div class="field">
+            <label>Caesar Shift (1–25)</label>
+            <input type="number" id="caesarShift" class="inp-sm" value="13" min="1" max="25">
+          </div>
+        </div>
+        <div id="optCharset" style="display:none">
+          <div class="field">
+            <label>Custom alphabet / charset</label>
+            <input type="text" id="customCharset" class="inp-sm" placeholder="Leave blank for standard" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Auto-detect -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;font-weight:600;color:var(--muted)">Auto-Detect</span>
+          <button class="detect-chip" onclick="autoDetect()" title="Detect encoding of the right panel content">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Detect Encoding
+          </button>
+        </div>
+        <div class="info-bar" id="detectBar" style="display:none">
+          <span id="detectMsg">—</span>
+          <span class="badge" id="detectBadge">—</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Decode / Encode -->
+        <div class="act-row">
+          <button class="btn-decode" onclick="doDecode()" title="Decode right → left (Ctrl+D)">
+            <i class="fa-solid fa-unlock"></i> Decode
+            <i class="fa-solid fa-arrow-right" style="font-size:11px"></i>
+          </button>
+          <button class="btn-encode" onclick="doEncode()" title="Encode left → right (Ctrl+E)">
+            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
+            <i class="fa-solid fa-lock"></i> Encode
+          </button>
+        </div>
+
+        <!-- Verify -->
+        <button onclick="doVerify()" style="width:100%;padding:7px;font-size:12px;font-weight:600;background:var(--inset);color:var(--txt);border:1px solid var(--bdr);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s" onmouseover="this.style.background='var(--inset2)'" onmouseout="this.style.background='var(--inset)'">
+          <i class="fa-solid fa-circle-check"></i> Verify Match
+        </button>
+
+        <div id="status" class="status"></div>
+
+        <div class="spacer"></div>
+        <div class="divider"></div>
+
+        <div style="font-size:12px;color:var(--muted);text-align:center;line-height:2;font-weight:700">
+          Ctrl+E &nbsp;Encode &nbsp;&nbsp; Ctrl+D &nbsp;Decode &nbsp;&nbsp; Ctrl+R &nbsp;Reset
+        </div>
+
+        <div class="bot-row">
+          <button class="btn btn-ghost sm" style="flex:1" onclick="shareConfig()">
+            <i class="fa-solid fa-link"></i> Share URL
+          </button>
+          <button class="btn btn-ghost sm" style="flex:1" onclick="resetAll()">
+            <i class="fa-solid fa-rotate"></i> Reset
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ RIGHT: Encoded ════════════════════════════════════ -->
+    <div class="panel">
+      <div class="panel-hdr"><i class="fa-solid fa-code"></i> ENCODED</div>
+      <div class="toolbar">
+        <button class="btn btn-ghost xs" onclick="copyText('outputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('outputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('outputData','encoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <div class="tb-fill"></div>
+      </div>
+      <textarea id="outputData" placeholder="Encoded data appears here — or paste encoded data to decode"></textarea>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   ENCODING REGISTRY
+══════════════════════════════════════════════════════════════ */
+var ENCODINGS = [
+  // ── Standard ──────────────────────────────────────────────
+  { id:'base64',      label:'Base64',      group:'Standard',  desc:'RFC 4648 Base64 encoding',               badge:'RFC4648' },
+  { id:'base64url',   label:'Base64 URL',  group:'Standard',  desc:'URL-safe Base64 (no +/= padding)',        badge:'RFC4648' },
+  { id:'base32',      label:'Base32',      group:'Standard',  desc:'Base32 encoding (A-Z 2-7)',               badge:'RFC4648' },
+  { id:'hex',         label:'Hex',         group:'Standard',  desc:'Hexadecimal encoding (lowercase)',        badge:'Base-16' },
+  { id:'binary',      label:'Binary',      group:'Standard',  desc:'Binary representation (space-separated bytes)',badge:'Base-2' },
+  { id:'octal',       label:'Octal',       group:'Standard',  desc:'Octal representation (space-separated)', badge:'Base-8' },
+  { id:'ascii85',     label:'ASCII85',     group:'Standard',  desc:'Ascii85 / Base85 encoding (btoa style)',  badge:'Base-85' },
+  // ── Web ───────────────────────────────────────────────────
+  { id:'url',         label:'URL',         group:'Web',       desc:'URL percent-encoding (encodeURIComponent)',badge:'RFC3986' },
+  { id:'urlall',      label:'URL Full',    group:'Web',       desc:'Full URL encoding (all non-ASCII + special)',badge:'RFC3986' },
+  { id:'html',        label:'HTML',        group:'Web',       desc:'HTML entity encoding (&amp; &lt; etc.)',  badge:'HTML5'   },
+  { id:'htmlfull',    label:'HTML Full',   group:'Web',       desc:'HTML numeric entities for every char',    badge:'HTML5'   },
+  { id:'unicode',     label:'Unicode',     group:'Web',       desc:'JavaScript \\uXXXX Unicode escape',      badge:'ES6'     },
+  { id:'jsesc',       label:'JS Escape',   group:'Web',       desc:'JavaScript string escape (\\n \\t etc.)', badge:'ES6'     },
+  { id:'cssesc',      label:'CSS Escape',  group:'Web',       desc:'CSS unicode escape (\\XXXXXX)',           badge:'CSS3'    },
+  { id:'xmlesc',      label:'XML',         group:'Web',       desc:'XML entity escaping (&amp; &lt; etc.)',   badge:'XML1.0'  },
+  { id:'jwt',         label:'JWT',         group:'Web',       desc:'JWT decode (shows header/payload)',       badge:'RFC7519' },
+  // ── Crypto / Security ─────────────────────────────────────
+  { id:'rot13',       label:'ROT-13',      group:'Cipher',    desc:'ROT-13 letter substitution cipher',      badge:'Cipher'  },
+  { id:'rot47',       label:'ROT-47',      group:'Cipher',    desc:'ROT-47 printable ASCII rotation',        badge:'Cipher'  },
+  { id:'caesar',      label:'Caesar',      group:'Cipher',    desc:'Caesar cipher with configurable shift',  badge:'Cipher'  },
+  { id:'atbash',      label:'Atbash',      group:'Cipher',    desc:'Atbash substitution (A↔Z B↔Y…)',         badge:'Cipher'  },
+  { id:'xor',         label:'XOR Hex',     group:'Cipher',    desc:'XOR each byte with 0xFF, output hex',    badge:'Cipher'  },
+  // ── Misc ──────────────────────────────────────────────────
+  { id:'morse',       label:'Morse',       group:'Misc',      desc:'International Morse code (. -)',          badge:'Morse'   },
+  { id:'nato',        label:'NATO',        group:'Misc',      desc:'NATO phonetic alphabet',                  badge:'NATO'    },
+  { id:'utf8hex',     label:'UTF-8 Hex',   group:'Misc',      desc:'Raw UTF-8 bytes as hex octets',          badge:'UTF-8'   },
+  { id:'decimal',     label:'Decimal',     group:'Misc',      desc:'Decimal byte values (space-separated)',  badge:'Base-10' },
+  { id:'quotedprint', label:'Quot-Print',  group:'Misc',      desc:'Quoted-Printable (email encoding)',       badge:'RFC2045' },
+  { id:'punycode',    label:'Punycode',    group:'Misc',      desc:'Punycode / IDN domain encoding',         badge:'RFC3492' },
+  { id:'escape',      label:'escape()',    group:'Misc',      desc:'Legacy JS escape() / unescape()',         badge:'Legacy'  },
+  { id:'unicode_name',label:'Uni-Name',    group:'Misc',      desc:'Unicode codepoints U+XXXX per char',     badge:'Unicode' },
+];
+
+var _current = 'base64';
+
+/* ─── DOM helpers ─────────────────────────────────────────── */
+var $ = function(id){ return document.getElementById(id); };
+function gv(id){ return $(id).value; }
+function sv(id,v){ $(id).value=v; }
+var ENC = new TextEncoder(), DEC = new TextDecoder();
+
+/* ─── Build encoding buttons ──────────────────────────────── */
+function buildGrid() {
+  var grid = $('encGrid');
+  grid.innerHTML = '';
+  // Group them
+  var groups = {}, order = [];
+  ENCODINGS.forEach(function(e) {
+    if (!groups[e.group]) { groups[e.group]=[]; order.push(e.group); }
+    groups[e.group].push(e);
+  });
+  // Insert group label + buttons directly into one scrollable ctrl area
+  // We'll build multiple mini-grids separated by group labels
+  var wrap = grid.parentElement; // .enc-group
+  wrap.innerHTML = '';
+  order.forEach(function(grp) {
+    var lbl = document.createElement('div');
+    lbl.className = 'enc-group-label';
+    lbl.textContent = grp;
+    wrap.appendChild(lbl);
+    var g = document.createElement('div');
+    g.className = 'enc-grid';
+    groups[grp].forEach(function(enc) {
+      var btn = document.createElement('button');
+      btn.id = 'enc_' + enc.id;
+      btn.className = 'enc-btn' + (enc.id === _current ? ' active' : '');
+      btn.textContent = enc.label;
+      btn.title = enc.desc;
+      btn.onclick = function(){ selectEnc(enc.id); };
+      g.appendChild(btn);
+    });
+    wrap.appendChild(g);
+  });
+  updateEncInfo();
+}
+
+function selectEnc(id) {
+  _current = id;
+  ENCODINGS.forEach(function(e) {
+    var b = $('enc_' + e.id);
+    if (b) b.className = 'enc-btn' + (e.id === id ? ' active' : '');
+  });
+  // Show/hide per-encoding options
+  $('optCaesar').style.display  = (id === 'caesar') ? '' : 'none';
+  $('outputData').classList.remove('verify-match','verify-fail');
+  updateEncInfo();
+}
+
+function getEnc(id) { return ENCODINGS.find(function(e){ return e.id===id; })||null; }
+
+function updateEncInfo() {
+  var e = getEnc(_current);
+  if (!e) return;
+  $('encInfo').textContent = e.desc;
+  $('encBadge').textContent = e.badge;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ENCODE / DECODE IMPLEMENTATIONS
+══════════════════════════════════════════════════════════════ */
+
+/* ── Utilities ──────────────────────────────────────────────── */
+function strToBytes(s){ return ENC.encode(s); }
+function bytesToStr(b){ return DEC.decode(b); }
+function hexToBytes(h){ h=h.replace(/\s/g,''); var b=new Uint8Array(h.length/2); for(var i=0;i<b.length;i++) b[i]=parseInt(h.slice(i*2,i*2+2),16); return b; }
+function bytesToHex(b){ return Array.from(b,function(x){ return x.toString(16).padStart(2,'0'); }).join(''); }
+function b64ToStr(s){ return atob(s.replace(/-/g,'+').replace(/_/g,'/')); }
+function strToB64(s){ return btoa(s); }
+
+/* ── Dispatch table ─────────────────────────────────────────── */
+var ENCODE = {
+  base64:     function(s){ var b=''; strToBytes(s).forEach(function(x){b+=String.fromCharCode(x);}); return btoa(b); },
+  base64url:  function(s){ var b=''; strToBytes(s).forEach(function(x){b+=String.fromCharCode(x);}); return btoa(b).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''); },
+  base32:     function(s){ return base32Encode(strToBytes(s)); },
+  hex:        function(s){ return bytesToHex(strToBytes(s)); },
+  binary:     function(s){ return Array.from(strToBytes(s),function(b){ return b.toString(2).padStart(8,'0'); }).join(' '); },
+  octal:      function(s){ return Array.from(strToBytes(s),function(b){ return b.toString(8); }).join(' '); },
+  ascii85:    function(s){ return ascii85Encode(strToBytes(s)); },
+  url:        function(s){ return encodeURIComponent(s); },
+  urlall:     function(s){ return encodeURIComponent(s).replace(/[!'()*]/g,function(c){ return '%'+c.charCodeAt(0).toString(16).toUpperCase(); }); },
+  html:       function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;'); },
+  htmlfull:   function(s){ var r=''; for(var i=0;i<s.length;i++){ var c=s.codePointAt(i); r+='&#'+c+';'; if(c>0xFFFF)i++; } return r; },
+  unicode:    function(s){ var r=''; for(var i=0;i<s.length;i++){ var c=s.charCodeAt(i); r+='\\u'+c.toString(16).toUpperCase().padStart(4,'0'); } return r; },
+  jsesc:      function(s){ return JSON.stringify(s).slice(1,-1); },
+  cssesc:     function(s){ var r=''; for(var i=0;i<s.length;i++){ var c=s.codePointAt(i); if(c>127||c<32) r+='\\'+c.toString(16).toUpperCase().padStart(6,'0')+' '; else r+=s[i]; if(c>0xFFFF)i++; } return r; },
+  xmlesc:     function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); },
+  jwt:        function(s){ return jwtEncode(s); },
+  rot13:      function(s){ return s.replace(/[a-zA-Z]/g,function(c){ var b=c<='Z'?65:97; return String.fromCharCode((c.charCodeAt(0)-b+13)%26+b); }); },
+  rot47:      function(s){ return s.replace(/[\x21-\x7e]/g,function(c){ return String.fromCharCode(33+((c.charCodeAt(0)-33+47)%94)); }); },
+  caesar:     function(s){ var sh=((parseInt(gv('caesarShift'))||13)%26+26)%26; return s.replace(/[a-zA-Z]/g,function(c){ var b=c<='Z'?65:97; return String.fromCharCode((c.charCodeAt(0)-b+sh)%26+b); }); },
+  atbash:     function(s){ return s.replace(/[a-zA-Z]/g,function(c){ var b=c<='Z'?65:97; return String.fromCharCode(b+25-(c.charCodeAt(0)-b)); }); },
+  xor:        function(s){ return Array.from(strToBytes(s),function(b){ return (b^0xFF).toString(16).padStart(2,'0'); }).join(' '); },
+  morse:      function(s){ return morseEncode(s); },
+  nato:       function(s){ return natoEncode(s); },
+  utf8hex:    function(s){ return Array.from(strToBytes(s),function(b){ return '0x'+b.toString(16).padStart(2,'0'); }).join(' '); },
+  decimal:    function(s){ return Array.from(strToBytes(s),function(b){ return b.toString(10); }).join(' '); },
+  quotedprint:function(s){ return quotedPrintableEncode(s); },
+  punycode:   function(s){ return punycodeEncode(s); },
+  escape:     function(s){ return escape(s); },
+  unicode_name:function(s){ var r=[]; for(var i=0;i<s.length;i++){ var c=s.codePointAt(i); r.push('U+'+c.toString(16).toUpperCase().padStart(4,'0')); if(c>0xFFFF)i++; } return r.join(' '); },
+};
+
+var DECODE = {
+  base64:     function(s){ var bin=b64ToStr(s.replace(/\s/g,'')); var b=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return bytesToStr(b); },
+  base64url:  function(s){ var p=s.trim().replace(/-/g,'+').replace(/_/g,'/'); while(p.length%4)p+='='; var bin=b64ToStr(p); var b=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i); return bytesToStr(b); },
+  base32:     function(s){ return bytesToStr(base32Decode(s)); },
+  hex:        function(s){ return bytesToStr(hexToBytes(s.replace(/\s/g,''))); },
+  binary:     function(s){ var bytes=s.trim().split(/\s+/).map(function(b){ return parseInt(b,2); }); return bytesToStr(new Uint8Array(bytes)); },
+  octal:      function(s){ var bytes=s.trim().split(/\s+/).map(function(b){ return parseInt(b,8); }); return bytesToStr(new Uint8Array(bytes)); },
+  ascii85:    function(s){ return bytesToStr(ascii85Decode(s)); },
+  url:        function(s){ return decodeURIComponent(s); },
+  urlall:     function(s){ return decodeURIComponent(s); },
+  html:       function(s){ var d=document.createElement('div'); d.innerHTML=s; return d.textContent||d.innerText||''; },
+  htmlfull:   function(s){ var d=document.createElement('div'); d.innerHTML=s; return d.textContent||d.innerText||''; },
+  unicode:    function(s){ return s.replace(/\\u([0-9a-fA-F]{4})/g,function(_,h){ return String.fromCharCode(parseInt(h,16)); }); },
+  jsesc:      function(s){ try{ return JSON.parse('"'+s.replace(/"/g,'\\"')+'"'); }catch(e){ return s; } },
+  cssesc:     function(s){ return s.replace(/\\([0-9a-fA-F]{1,6})\s?/g,function(_,h){ return String.fromCodePoint(parseInt(h,16)); }); },
+  xmlesc:     function(s){ return s.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#x([0-9a-fA-F]+);/gi,function(_,h){ return String.fromCodePoint(parseInt(h,16)); }).replace(/&#(\d+);/g,function(_,n){ return String.fromCodePoint(parseInt(n)); }); },
+  jwt:        function(s){ return jwtDecode(s); },
+  rot13:      function(s){ return ENCODE.rot13(s); }, // symmetric
+  rot47:      function(s){ return ENCODE.rot47(s); }, // symmetric
+  caesar:     function(s){ var sh=((parseInt(gv('caesarShift'))||13)%26+26)%26; var rev=(26-sh)%26; return s.replace(/[a-zA-Z]/g,function(c){ var b=c<='Z'?65:97; return String.fromCharCode((c.charCodeAt(0)-b+rev)%26+b); }); },
+  atbash:     function(s){ return ENCODE.atbash(s); }, // symmetric
+  xor:        function(s){ var bytes=s.trim().split(/\s+/).map(function(h){ return parseInt(h,16)^0xFF; }); return bytesToStr(new Uint8Array(bytes)); },
+  morse:      function(s){ return morseDecode(s); },
+  nato:       function(s){ return natoDecode(s); },
+  utf8hex:    function(s){ var bytes=s.trim().split(/\s+/).map(function(h){ return parseInt(h,16); }); return bytesToStr(new Uint8Array(bytes)); },
+  decimal:    function(s){ var bytes=s.trim().split(/\s+/).map(function(n){ return parseInt(n,10); }); return bytesToStr(new Uint8Array(bytes)); },
+  quotedprint:function(s){ return quotedPrintableDecode(s); },
+  punycode:   function(s){ return punycodeDecode(s); },
+  escape:     function(s){ return unescape(s); },
+  unicode_name:function(s){ return s.trim().split(/\s+/).map(function(u){ return String.fromCodePoint(parseInt(u.replace(/^U\+/i,''),16)); }).join(''); },
+};
+
+/* ─── Main actions ────────────────────────────────────────── */
+function doEncode() {
+  try {
+    var input = gv('inputData');
+    if (!input) throw new Error('Decoded panel is empty');
+    var fn = ENCODE[_current];
+    if (!fn) throw new Error('No encoder for ' + _current);
+    sv('outputData', fn(input));
+    $('outputData').classList.remove('verify-match','verify-fail');
+    showStatus(getEnc(_current).label + ' encoded', 'success');
+  } catch(e) { showStatus(e.message,'error'); console.error(e); }
+}
+
+function doDecode() {
+  try {
+    var input = gv('outputData');
+    if (!input) throw new Error('Encoded panel is empty');
+    var fn = DECODE[_current];
+    if (!fn) throw new Error('No decoder for ' + _current);
+    sv('inputData', fn(input));
+    $('outputData').classList.remove('verify-match','verify-fail');
+    showStatus(getEnc(_current).label + ' decoded', 'success');
+  } catch(e) { showStatus(e.message,'error'); console.error(e); }
+}
+
+function doVerify() {
+  try {
+    var left  = gv('inputData').trim();
+    var right = gv('outputData').trim();
+    if (!left || !right) throw new Error('Both panels must have content to verify');
+    var fn = ENCODE[_current];
+    if (!fn) throw new Error('No encoder for ' + _current);
+    var encoded = fn(left).trim();
+    var match = (encoded === right) || (encoded.toLowerCase() === right.toLowerCase());
+    // Also try decoding right and comparing
+    if (!match) {
+      try {
+        var decoded = DECODE[_current](right).trim();
+        match = (decoded === left);
+      } catch(e2) {}
+    }
+    $('outputData').classList.remove('verify-match','verify-fail');
+    $('outputData').classList.add(match ? 'verify-match' : 'verify-fail');
+    showStatus(match ? 'Match — both panels are equivalent' : 'No match — content does not correspond', match ? 'success' : 'error');
+  } catch(e) { showStatus(e.message,'error'); }
+}
+
+function swapPanels() {
+  var a=gv('inputData'), b=gv('outputData');
+  sv('inputData',b); sv('outputData',a);
+  $('outputData').classList.remove('verify-match','verify-fail');
+  showStatus('Panels swapped','success');
+}
+
+/* ─── Auto-detect ────────────────────────────────────────── */
+function autoDetect() {
+  var s = gv('outputData').trim() || gv('inputData').trim();
+  if (!s) { showStatus('Enter data in either panel to detect','warn'); return; }
+  var bar=$('detectBar'), msg=$('detectMsg'), bdg=$('detectBadge');
+  bar.style.display='flex';
+
+  var detected = detectEncoding(s);
+  if (detected) {
+    msg.textContent = detected.label + ' — ' + detected.desc;
+    bdg.className='badge badge-ok'; bdg.textContent='Detected';
+    // Select the detected encoding
+    selectEnc(detected.id);
+    buildGrid(); // refresh active state
+    showStatus('Detected: ' + detected.label, 'success');
+  } else {
+    msg.textContent='Could not confidently detect encoding';
+    bdg.className='badge badge-warn'; bdg.textContent='Unknown';
+    showStatus('Encoding could not be detected', 'warn');
+  }
+}
+
+function detectEncoding(s) {
+  var clean = s.trim();
+  // JWT: three base64url segments separated by dots
+  if (/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]*$/.test(clean)) return getEnc('jwt');
+  // Morse
+  if (/^[.\-\/\s]+$/.test(clean) && clean.length>1) return getEnc('morse');
+  // Binary: groups of 8 bits
+  if (/^[01]{8}( [01]{8})*$/.test(clean)) return getEnc('binary');
+  // Hex: even-length hex string
+  if (/^[0-9a-fA-F\s]+$/.test(clean) && clean.replace(/\s/g,'').length%2===0 && clean.replace(/\s/g,'').length>0) return getEnc('hex');
+  // URL encoded
+  if (/%[0-9a-fA-F]{2}/.test(clean)) return getEnc('url');
+  // HTML entities
+  if (/&[a-z]+;|&#[0-9]+;|&#x[0-9a-f]+;/i.test(clean)) return getEnc('html');
+  // Unicode escape \uXXXX
+  if (/\\u[0-9a-fA-F]{4}/.test(clean)) return getEnc('unicode');
+  // CSS escape
+  if (/\\[0-9a-fA-F]{1,6}\s/.test(clean)) return getEnc('cssesc');
+  // Quoted-Printable
+  if (/=[0-9A-F]{2}/.test(clean) && /=\r?\n/.test(clean)) return getEnc('quotedprint');
+  // Decimal bytes
+  if (/^\d+( \d+)+$/.test(clean) && clean.split(' ').every(function(n){ return parseInt(n)<=255; })) return getEnc('decimal');
+  // Octal bytes
+  if (/^[0-7]+( [0-7]+)+$/.test(clean)) return getEnc('octal');
+  // Base64 URL-safe (contains - or _)
+  if (/^[A-Za-z0-9\-_]+=*$/.test(clean) && clean.indexOf('-')>-1) return getEnc('base64url');
+  // Base64 standard
+  if (/^[A-Za-z0-9+/]+=*$/.test(clean) && clean.length%4===0 && clean.length>=4) {
+    try { atob(clean); return getEnc('base64'); } catch(e) {}
+  }
+  // Punycode
+  if (/xn--/.test(clean)) return getEnc('punycode');
+  // UTF-8 Hex bytes (0x__ pattern)
+  if (/^(0x[0-9a-fA-F]{2}\s*)+$/.test(clean)) return getEnc('utf8hex');
+  // Unicode names U+XXXX
+  if (/^(U\+[0-9A-Fa-f]{4,6}\s*)+$/.test(clean)) return getEnc('unicode_name');
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════
+   ALGORITHM IMPLEMENTATIONS
+══════════════════════════════════════════════════════════ */
+
+/* ── Base32 ────────────────────────────────────────────────── */
+var B32_CHARS='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+function base32Encode(bytes){
+  var r='',buf=0,bits=0;
+  for(var i=0;i<bytes.length;i++){buf=(buf<<8)|bytes[i];bits+=8;while(bits>=5){r+=B32_CHARS[(buf>>(bits-5))&31];bits-=5;}}
+  if(bits>0){r+=B32_CHARS[(buf<<(5-bits))&31];}
+  while(r.length%8)r+='=';
+  return r;
+}
+function base32Decode(s){
+  s=s.toUpperCase().replace(/=+$/,'');
+  var r=[],buf=0,bits=0;
+  for(var i=0;i<s.length;i++){var v=B32_CHARS.indexOf(s[i]);if(v<0)continue;buf=(buf<<5)|v;bits+=5;if(bits>=8){r.push((buf>>(bits-8))&0xff);bits-=8;}}
+  return new Uint8Array(r);
+}
+
+/* ── ASCII85 (btoa-style, <~ ~> delimiters) ────────────────── */
+function ascii85Encode(bytes) {
+  var r='<~';
+  for(var i=0;i<bytes.length;i+=4){
+    var v=(bytes[i]||0)*16777216+(bytes[i+1]||0)*65536+(bytes[i+2]||0)*256+(bytes[i+3]||0);
+    if(v===0&&i+4<=bytes.length){r+='z';}
+    else{var c=[];for(var j=4;j>=0;j--){c[j]=v%85+33;v=Math.floor(v/85);}r+=String.fromCharCode.apply(null,c);}
+  }
+  return r+'~>';
+}
+function ascii85Decode(s) {
+  s=s.replace(/^<~/,'').replace(/~>$/,'').replace(/\s/g,'');
+  var bytes=[];
+  for(var i=0;i<s.length;i+=5){
+    var chunk=s.slice(i,i+5);
+    if(chunk==='z'){bytes.push(0,0,0,0);continue;}
+    var v=0;
+    for(var j=0;j<5;j++) v+=((chunk.charCodeAt(j)||0)-33)*Math.pow(85,4-j);
+    var count=Math.min(4,chunk.length-1);
+    for(var j=3;j>=0;j--){if(j<count)bytes.push((v>>(j*8))&0xff);v=v;}
+  }
+  return new Uint8Array(bytes);
+}
+
+/* ── Morse ──────────────────────────────────────────────────── */
+var MORSE_MAP={'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.','G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..','M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.','S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-','Y':'-.--','Z':'--..',
+  '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.','.':'.-.-.-',',':'--..--',':':'---...','"':'.-..-.','\'':'.----.','!':'-.-.--','-':'-....-','?':'..--..','@':'.--.-.','(':'-.--.'};
+var MORSE_REV={};
+Object.keys(MORSE_MAP).forEach(function(k){MORSE_REV[MORSE_MAP[k]]=k;});
+function morseEncode(s){return s.toUpperCase().split('').map(function(c){if(c===' ')return '/';return MORSE_MAP[c]||'';}).filter(function(x){return x!==undefined;}).join(' ');}
+function morseDecode(s){return s.trim().split(/\s*\/\s*/).map(function(word){return word.trim().split(/\s+/).map(function(sym){return MORSE_REV[sym]||'?';}).join('');}).join(' ');}
+
+/* ── NATO phonetic ─────────────────────────────────────────── */
+var NATO={'A':'Alpha','B':'Bravo','C':'Charlie','D':'Delta','E':'Echo','F':'Foxtrot','G':'Golf','H':'Hotel','I':'India','J':'Juliet','K':'Kilo','L':'Lima','M':'Mike','N':'November','O':'Oscar','P':'Papa','Q':'Quebec','R':'Romeo','S':'Sierra','T':'Tango','U':'Uniform','V':'Victor','W':'Whiskey','X':'X-ray','Y':'Yankee','Z':'Zulu','0':'Zero','1':'One','2':'Two','3':'Three','4':'Four','5':'Five','6':'Six','7':'Seven','8':'Eight','9':'Nine'};
+var NATO_REV={};Object.keys(NATO).forEach(function(k){NATO_REV[NATO[k].toLowerCase()]=k;});
+function natoEncode(s){return s.toUpperCase().split('').map(function(c){return NATO[c]||c;}).join(' ');}
+function natoDecode(s){return s.trim().split(/\s+/).map(function(w){return NATO_REV[w.toLowerCase()]||w;}).join('');}
+
+/* ── Quoted-Printable ──────────────────────────────────────── */
+function quotedPrintableEncode(s){
+  var bytes=strToBytes(s),r='',line=0;
+  for(var i=0;i<bytes.length;i++){
+    var b=bytes[i],c=String.fromCharCode(b);
+    var enc=(b>=33&&b<=126&&b!==61)?c:'='+b.toString(16).toUpperCase().padStart(2,'0');
+    if(line+enc.length>75){r+='=\r\n';line=0;}
+    r+=enc;line+=enc.length;
+  }
+  return r;
+}
+function quotedPrintableDecode(s){
+  return bytesToStr(strToBytes(s.replace(/=\r?\n/g,'').replace(/=([0-9A-Fa-f]{2})/g,function(_,h){return String.fromCharCode(parseInt(h,16));})));
+}
+
+/* ── Punycode (simple IDN domains) ────────────────────────── */
+function punycodeEncode(s){
+  try{return new URL('https://'+s).hostname;}
+  catch(e){ return s.split('.').map(function(part){ if(/[^\x00-\x7e]/.test(part)){var ascii=[],nonAscii=[],delta=0,bias=72,n=128,h,b; for(var i=0;i<part.length;i++){var c=part.codePointAt(i); if(c<128)ascii.push(String.fromCodePoint(c)); else nonAscii.push(c);} return 'xn--'+ascii.join('')+(ascii.length?'-':'')+nonAscii.map(function(c){return c.toString(16);}).join('');}return part;}).join('.');}
+}
+function punycodeDecode(s){
+  try{
+    return s.split('.').map(function(part){
+      if(part.toLowerCase().startsWith('xn--')){
+        var rest=part.slice(4);
+        var dash=rest.lastIndexOf('-');
+        var ascii=dash>=0?rest.slice(0,dash):'';
+        return ascii||rest;
+      }
+      return part;
+    }).join('.');
+  }catch(e){return s;}
+}
+
+/* ── JWT ─────────────────────────────────────────────────────── */
+function jwtDecode(s){
+  var parts=s.trim().split('.');
+  if(parts.length<2)throw new Error('Not a valid JWT (need at least header.payload)');
+  function decPart(p){
+    p=p.replace(/-/g,'+').replace(/_/g,'/');
+    while(p.length%4)p+='=';
+    try{return JSON.stringify(JSON.parse(atob(p)),null,2);}catch(e){return atob(p);}
+  }
+  return 'Header:\n'+decPart(parts[0])+'\n\nPayload:\n'+decPart(parts[1])+(parts[2]?'\n\nSignature: '+parts[2]:'');
+}
+function jwtEncode(s){
+  // Encode plain JSON as a JWT header.payload (no signature)
+  try{
+    var obj=JSON.parse(s);
+    var hdr=btoa(JSON.stringify({alg:'none',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    var pld=btoa(JSON.stringify(obj)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    return hdr+'.'+pld+'.';
+  }catch(e){
+    var enc=btoa(unescape(encodeURIComponent(s))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    var hdr=btoa(JSON.stringify({alg:'none',typ:'JWT'})).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+    return hdr+'.'+enc+'.';
+  }
+}
+
+/* ── Clipboard / download ─────────────────────────────────── */
+function copyText(id){
+  var v=gv(id);if(!v){showStatus('Nothing to copy','warn');return;}
+  var ok=function(){showStatus('Copied to clipboard','success');};
+  var fail=function(){try{$(id).select();document.execCommand('copy');ok();}catch(e){showStatus('Copy failed','error');}};
+  (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v):Promise.reject()).then(ok).catch(fail);
+}
+function clearField(id){
+  sv(id,'');
+  if(id==='outputData')$('outputData').classList.remove('verify-match','verify-fail');
+  showStatus('Cleared','success');
+}
+function dlText(id,name){
+  var v=gv(id);if(!v){showStatus('Nothing to save','warn');return;}
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([v],{type:'text/plain'}));
+  a.download=name;a.click();URL.revokeObjectURL(a.href);
+  showStatus('Download started','success');
+}
+
+/* ── Status ──────────────────────────────────────────────── */
+var _st;
+function showStatus(msg,type){
+  type=type||'success';var s=$('status');
+  s.textContent=msg;s.className='status '+type;s.style.display='block';
+  clearTimeout(_st);_st=setTimeout(function(){s.style.display='none';},4000);
+}
+
+/* ── Share URL ────────────────────────────────────────────── */
+function b64uEnc(str){
+  var bytes=new TextEncoder().encode(str),bin='';
+  bytes.forEach(function(b){bin+=String.fromCharCode(b);});
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+function b64uDec(str){
+  str=str.replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length%4)str+='=';
+  var bin=atob(str),bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function shareConfig(){
+  var state={v:1,enc:_current,caesar:gv('caesarShift'),input:gv('inputData'),output:gv('outputData')};
+  try{
+    var url=window.location.href.split('#')[0]+'#s='+b64uEnc(JSON.stringify(state));
+    var ok=function(){showStatus('Share URL copied to clipboard','success');};
+    (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(url):Promise.reject()).then(ok).catch(function(){try{var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;top:-9999px;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');ok();document.body.removeChild(ta);}catch(e){prompt('Copy URL:',url);}});
+  }catch(e){showStatus('Could not generate URL','error');}
+}
+function loadFromHash(){
+  var hash=window.location.hash;
+  if(!hash||hash.indexOf('s=')===-1)return;
+  try{
+    var enc2=new URLSearchParams(hash.slice(1)).get('s');
+    if(!enc2)return;
+    var state=JSON.parse(b64uDec(enc2));
+    if(state.enc) _current=state.enc;
+    if(state.caesar) sv('caesarShift',state.caesar);
+    if(state.input!==undefined) sv('inputData',state.input);
+    if(state.output!==undefined) sv('outputData',state.output);
+    buildGrid();
+    showStatus('Configuration loaded from URL','success');
+  }catch(e){console.warn('loadFromHash:',e);}
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+function resetAll(){
+  if(!confirm('Reset all fields?'))return;
+  sv('inputData','');sv('outputData','');
+  $('outputData').classList.remove('verify-match','verify-fail');
+  $('detectBar').style.display='none';
+  sv('caesarShift','13');
+  _current='base64';
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  buildGrid();
+  showStatus('Reset complete','success');
+}
+
+/* ── Theme ───────────────────────────────────────────────── */
+function toggleTheme(){
+  var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('enc-theme',next);
+  $('themeIcon').className=next==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';
+}
+function loadTheme(){
+  var t=localStorage.getItem('enc-theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  $('themeIcon').className=t==='dark'?'fa-solid fa-sun':'fa-solid fa-moon';
+}
+
+/* ── Keyboard shortcuts ──────────────────────────────────── */
+document.addEventListener('keydown',function(e){
+  if(!(e.ctrlKey||e.metaKey))return;
+  if(e.key.toLowerCase()==='e'){e.preventDefault();doEncode();}
+  if(e.key.toLowerCase()==='d'){e.preventDefault();doDecode();}
+  if(e.key.toLowerCase()==='r'){e.preventDefault();resetAll();}
+});
+
+/* ── Init ────────────────────────────────────────────────── */
+loadTheme();
+loadFromHash();
+buildGrid();
+$('optCaesar').style.display = (_current==='caesar') ? '' : 'none';
+</script>
+</body>
+</html>
