@@ -121,9 +121,18 @@
 
     /* ── Footer ─────────────────────────────────────────────── */
     footer {
-      text-align:center; padding:16px 24px; border-top:1px solid var(--bdr);
-      font-size:12px; color:var(--muted);
+      text-align:center; padding:20px 24px;
+      border-top:1px solid var(--bdr);
     }
+    .footer-gh {
+      display:inline-flex; align-items:center; gap:7px;
+      font-size:13px; font-weight:600; color:var(--muted);
+      text-decoration:none; padding:7px 14px;
+      border:1px solid var(--bdr); border-radius:8px;
+      background:var(--surf); transition:all .18s;
+    }
+    .footer-gh i { font-size:16px; }
+    .footer-gh:hover { color:var(--txt); border-color:var(--txt); background:var(--inset); }
 
     @media (max-width:540px) {
       .err-card { padding:32px 20px; }
@@ -135,7 +144,7 @@
 <body>
 
   <header>
-    <a href="/" class="brand">
+    <a href="/CyberKitchen" class="brand">
       <i class="fa-solid fa-kitchen-set"></i> CyberKitchen
     </a>
     <div></div>
@@ -155,29 +164,29 @@
       <div class="err-path" id="errPath">/</div>
 
       <div class="btn-row">
-        <a href="/" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
+        <a href="/CyberKitchen" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
         <button class="btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Go Back</button>
       </div>
 
       <div class="quick-links">
         <div class="quick-label">Quick access</div>
         <div class="quick-grid">
-          <a href="/tools/crypto/aes/" class="quick-link">
+          <a href="/CyberKitchen/tools/crypto/aes/" class="quick-link">
             <i class="fa-solid fa-lock"></i> AES
           </a>
-          <a href="/tools/crypto/rsa/" class="quick-link">
+          <a href="/CyberKitchen/tools/crypto/rsa/" class="quick-link">
             <i class="fa-solid fa-shield-halved"></i> RSA
           </a>
-          <a href="/tools/hash/" class="quick-link">
+          <a href="/CyberKitchen/tools/hash/" class="quick-link">
             <i class="fa-solid fa-hashtag"></i> Hash
           </a>
-          <a href="/tools/encode/" class="quick-link">
+          <a href="/CyberKitchen/tools/encode/" class="quick-link">
             <i class="fa-solid fa-code"></i> Encode
           </a>
-          <a href="/tools/crypto/classical/" class="quick-link">
+          <a href="/CyberKitchen/tools/crypto/classical/" class="quick-link">
             <i class="fa-solid fa-scroll"></i> Ciphers
           </a>
-          <a href="/tools/convert/number/" class="quick-link">
+          <a href="/CyberKitchen/tools/convert/number/" class="quick-link">
             <i class="fa-solid fa-calculator"></i> Numbers
           </a>
         </div>
@@ -186,7 +195,10 @@
   </main>
 
   <footer>
-    CyberKitchen - All processing happens locally in your browser. No data leaves your machine.
+    <a href="https://github.com/patkarmandar/CyberKitchen" target="_blank" rel="noopener" class="footer-gh">
+      <i class="fa-brands fa-github"></i>
+      patkarmandar/CyberKitchen
+    </a>
   </footer>
 
 <script>
