@@ -3,28 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSA Encrypt / Decrypt Tool</title>
+  <title>RSA Encrypt / Decrypt - CyberKitchen</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
-      --bg:     #f8fafc;
-      --surf:   #ffffff;
-      --inset:  #f1f5f9;
+      --bg:#f8fafc;
+      --surf:#ffffff;
+      --inset:#f1f5f9;
       --inset2: #e4eaf1;
-      --txt:    #0f172a;
-      --muted:  #64748b;
-      --acc:    #3b82f6;
-      --ok:     #10b981;
-      --err:    #ef4444;
-      --warn:   #f59e0b;
-      --bdr:    #e2e8f0;
-      --shd:    rgba(0,0,0,.07);
+      --txt:#0f172a;
+      --muted:#64748b;
+      --acc:#3b82f6;
+      --ok:#10b981;
+      --err:#ef4444;
+      --warn:#f59e0b;
+      --bdr:#e2e8f0;
+      --shd:rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
-      --bg:    #0d1117;  --surf:  #161b22;
+      --bg:#0d1117;  --surf:#161b22;
       --inset: #21262d;  --inset2:#2d333b;
-      --txt:   #e6edf3;  --muted: #8b949e;
-      --bdr:   #30363d;  --shd:   rgba(0,0,0,.4);
+      --txt:#e6edf3;  --muted: #8b949e;
+      --bdr:#30363d;  --shd:rgba(0,0,0,.4);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x: hidden; }
@@ -327,7 +327,7 @@
         </div>
         <div class="key-status">
           <span>Public key</span>
-          <span class="badge" id="pubBadge">—</span>
+          <span class="badge" id="pubBadge">-</span>
         </div>
 
         <!-- Private Key -->
@@ -344,7 +344,7 @@
         </div>
         <div class="key-status">
           <span>Private key</span>
-          <span class="badge" id="privBadge">—</span>
+          <span class="badge" id="privBadge">-</span>
         </div>
 
         <div class="divider"></div>
@@ -363,7 +363,7 @@
         <!-- Max plaintext -->
         <div class="info-bar">
           <span>Max plaintext</span>
-          <span class="badge badge-inf" id="maxBadge">—</span>
+          <span class="badge badge-inf" id="maxBadge">-</span>
         </div>
 
         <div class="divider"></div>
@@ -498,7 +498,7 @@ function importPrivateKey(pem, hash) {
   try {
     var der = pemToAb(pem);
     // Try PKCS#8 first (BEGIN PRIVATE KEY), then fall back to PKCS#1 (BEGIN RSA PRIVATE KEY)
-    // SubtleCrypto only accepts PKCS#8 — if it's PKCS#1 we must prefix the PKCS#8 header
+    // SubtleCrypto only accepts PKCS#8 - if it's PKCS#1 we must prefix the PKCS#8 header
     var format = pem.trim().toUpperCase().includes('RSA PRIVATE KEY') ? 'pkcs1' : 'pkcs8';
     if (format === 'pkcs1') {
       // Wrap RSA PKCS#1 in a PKCS#8 AlgorithmIdentifier envelope
@@ -601,7 +601,7 @@ async function validatePubKey() {
   var pem = gv('pubKey').trim();
   var ta  = $('pubKey'), bdg = $('pubBadge');
   ta.classList.remove('pem-ok','pem-err');
-  bdg.className = 'badge'; bdg.textContent = '—';
+  bdg.className = 'badge'; bdg.textContent = '-';
   if (!pem) { updateMaxSize(); return; }
   try {
     var key = await importPublicKey(pem, gv('padding'));
@@ -626,7 +626,7 @@ async function validatePrivKey() {
   var pem = gv('privKey').trim();
   var ta  = $('privKey'), bdg = $('privBadge');
   ta.classList.remove('pem-ok','pem-err');
-  bdg.className = 'badge'; bdg.textContent = '—';
+  bdg.className = 'badge'; bdg.textContent = '-';
   if (!pem) return;
   try {
     var key = await importPrivateKey(pem, gv('padding'));
@@ -648,7 +648,7 @@ var HASH_BYTES = { 'SHA-1': 20, 'SHA-256': 32, 'SHA-384': 48, 'SHA-512': 64 };
 
 function updateMaxSize(bits) {
   var b = $('maxBadge');
-  if (!bits) { b.className = 'badge badge-inf'; b.textContent = '—'; return; }
+  if (!bits) { b.className = 'badge badge-inf'; b.textContent = '-'; return; }
   var keyBytes = bits / 8;
   var hLen     = HASH_BYTES[gv('padding')] || 32;
   var maxBytes = keyBytes - 2 * hLen - 2;   // RSA-OAEP formula
@@ -711,7 +711,7 @@ async function doDecrypt() {
   } catch(e) {
     var msg = e.message || 'Decryption failed';
     if (msg.includes('OperationError') || msg.includes('decryption'))
-      msg = 'Decryption failed — check private key, padding scheme and ciphertext format';
+      msg = 'Decryption failed - check private key, padding scheme and ciphertext format';
     showStatus(msg, 'error'); console.error(e);
   }
 }

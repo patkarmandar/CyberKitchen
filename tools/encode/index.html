@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encoder / Decoder — CyberKitchen</title>
+  <title>Encoder / Decoder - CyberKitchen</title>
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css'">
@@ -171,7 +171,7 @@
     .btn-ghost { background:var(--inset); color:var(--txt); border:1px solid var(--bdr); }
     .btn-ghost:hover { background:var(--inset2); }
 
-    /* Encode LEFT, Decode RIGHT — arrows show data-flow direction */
+    /* Encode LEFT, Decode RIGHT - arrows show data-flow direction */
     .btn-encode {
       flex:1; padding:9px 12px; font-size:13px; font-weight:700;
       background:linear-gradient(135deg,#10b981,#059669); color:#fff;
@@ -282,13 +282,13 @@
       <div class="panel-hdr"><i class="fa-solid fa-gear"></i> CONFIGURATION</div>
       <div class="ctrl-scroll">
 
-        <!-- Encoding groups — filled by JS -->
+        <!-- Encoding groups - filled by JS -->
         <div id="encGroupsWrap"></div>
 
         <!-- Selected encoding info -->
         <div class="info-bar">
-          <span id="encInfo">—</span>
-          <span class="badge badge-inf" id="encBadge">—</span>
+          <span id="encInfo">-</span>
+          <span class="badge badge-inf" id="encBadge">-</span>
         </div>
 
 
@@ -303,8 +303,8 @@
           </button>
         </div>
         <div class="info-bar" id="detectBar" style="display:none">
-          <span id="detectMsg">—</span>
-          <span class="badge" id="detectBadge">—</span>
+          <span id="detectMsg">-</span>
+          <span class="badge" id="detectBadge">-</span>
         </div>
 
         <div class="divider"></div>
@@ -359,7 +359,7 @@
         <button class="btn btn-ghost xs" onclick="dlText('outputData','encoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
       </div>
-      <textarea id="outputData" placeholder="Encoded data appears here — or paste encoded data to decode"></textarea>
+      <textarea id="outputData" placeholder="Encoded data appears here - or paste encoded data to decode"></textarea>
     </div>
 
   </div>
@@ -683,7 +683,7 @@ function doVerify(){
     if(!match){try{var decoded=DECODE_FN[_current](right).trim();match=(decoded===left);}catch(e){}}
     $('outputData').classList.remove('verify-match','verify-fail');
     $('outputData').classList.add(match?'verify-match':'verify-fail');
-    showStatus(match?'Match — both panels are equivalent':'No match — content does not correspond',match?'success':'error');
+    showStatus(match?'Match - both panels are equivalent':'No match - content does not correspond',match?'success':'error');
   }catch(e){showStatus(e.message,'error');}
 }
 
@@ -702,7 +702,7 @@ function autoDetect(){
   bar.style.display='flex';
   var detected=detectEncoding(s);
   if(detected){
-    msg.textContent=detected.label+' — '+detected.desc;
+    msg.textContent=detected.label+' - '+detected.desc;
     bdg.className='badge badge-ok';bdg.textContent='Detected';
     selectEnc(detected.id);buildGrid();
     showStatus('Detected: '+detected.label,'success');

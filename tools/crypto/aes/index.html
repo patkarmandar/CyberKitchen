@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AES Encrypt / Decrypt Tool</title>
+  <title>AES Encrypt / Decrypt - CyberKitchen</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
     :root {
-      --bg:     #f8fafc;
-      --surf:   #ffffff;
-      --inset:  #f1f5f9;
+      --bg:#f8fafc;
+      --surf:#ffffff;
+      --inset:#f1f5f9;
       --inset2: #e4eaf1;
-      --txt:    #0f172a;
-      --muted:  #64748b;
-      --acc:    #3b82f6;
-      --acc2:   #2563eb;
-      --ok:     #10b981;
-      --err:    #ef4444;
-      --warn:   #f59e0b;
-      --bdr:    #e2e8f0;
-      --shd:    rgba(0,0,0,.07);
+      --txt:#0f172a;
+      --muted:#64748b;
+      --acc:#3b82f6;
+      --acc2:#2563eb;
+      --ok:#10b981;
+      --err:#ef4444;
+      --warn:#f59e0b;
+      --bdr:#e2e8f0;
+      --shd:rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
-      --bg:    #0d1117;
-      --surf:  #161b22;
+      --bg:#0d1117;
+      --surf:#161b22;
       --inset: #21262d;
       --inset2:#2d333b;
-      --txt:   #e6edf3;
+      --txt:#e6edf3;
       --muted: #8b949e;
-      --bdr:   #30363d;
-      --shd:   rgba(0,0,0,.4);
+      --bdr:#30363d;
+      --shd:rgba(0,0,0,.4);
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x: hidden; }
@@ -208,11 +208,13 @@
       flex: 1;
       background: linear-gradient(135deg, #10b981, #059669);
       color: #fff; padding: 9px 12px; font-size: 14px;
+      font-weight:700;
     }
     .btn-dec {
       flex: 1;
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       color: #fff; padding: 9px 12px; font-size: 14px;
+      font-weight:700;
     }
     .btn-enc:hover, .btn-dec:hover {
       filter: brightness(1.1); transform: translateY(-1px);
@@ -275,7 +277,7 @@
       background: var(--inset);
     }
     .home-link i { font-size: 12px; flex-shrink: 0; }
-    /* Hide the text label on small screens — keep only icons */
+    /* Hide the text label on small screens - keep only icons */
     @media (max-width: 540px) {
       .home-link .link-text { display: none; }
       .home-link { padding: 5px 8px; gap: 4px; }
@@ -367,7 +369,7 @@
         <!-- Key badge -->
         <div class="info-bar">
           <span>Key size</span>
-          <span class="badge" id="keyBadge">—</span>
+          <span class="badge" id="keyBadge">-</span>
         </div>
 
         <!-- IV -->
@@ -393,11 +395,11 @@
         <div class="field">
           <label>AES Mode</label>
           <select id="mode" onchange="onModeChange()">
-            <option value="CBC">CBC — Cipher Block Chaining</option>
-            <option value="ECB">ECB — Electronic Codebook</option>
-            <option value="CFB">CFB — Cipher Feedback</option>
-            <option value="OFB">OFB — Output Feedback</option>
-            <option value="CTR">CTR — Counter Mode</option>
+            <option value="CBC">CBC - Cipher Block Chaining</option>
+            <option value="ECB">ECB - Electronic Codebook</option>
+            <option value="CFB">CFB - Cipher Feedback</option>
+            <option value="OFB">OFB - Output Feedback</option>
+            <option value="CTR">CTR - Counter Mode</option>
           </select>
         </div>
 
@@ -525,7 +527,7 @@ function updateKeyBadge() {
 
   // Always reset first
   b.className  = 'badge';
-  b.textContent = '—';
+  b.textContent = '-';
   ki.classList.remove('key-ok', 'key-warn');
 
   if (!val) return; // empty → neutral, no outline at all
@@ -546,7 +548,7 @@ function updateKeyBadge() {
     b.textContent = 'AES-256  (256-bit)';
     ki.classList.add('key-ok');
   } else {
-    // Invalid size — show what is needed for this format
+    // Invalid size - show what is needed for this format
     var hint;
     if (fmt === 'hex')
       hint = 'need 32, 48 or 64 hex chars';
@@ -555,7 +557,7 @@ function updateKeyBadge() {
     else
       hint = 'need 16, 24 or 32 chars';
     b.classList.add('badge-bad');
-    b.textContent = (n * 8) + '-bit — ' + hint;
+    b.textContent = (n * 8) + '-bit - ' + hint;
     ki.classList.add('key-warn');
   }
 }
@@ -647,11 +649,11 @@ function doDecrypt() {
     if (pFmt === 'utf8') {
       out = dec.toString(CryptoJS.enc.Utf8);
       if (!out && dec.sigBytes > 0)
-        throw new Error('Result is not valid UTF-8 — switch Plaintext format to Hex or Base64');
+        throw new Error('Result is not valid UTF-8 - switch Plaintext format to Hex or Base64');
     } else {
       out = waToStr(dec, pFmt);
     }
-    if (!out) throw new Error('Decryption returned empty output — check key, IV, mode and formats');
+    if (!out) throw new Error('Decryption returned empty output - check key, IV, mode and formats');
     sv('pt', out);
     showStatus('Decryption successful', 'success');
   } catch(e) { showStatus(e.message, 'error'); console.error(e); }

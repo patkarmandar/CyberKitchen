@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hash Generator — CyberKitchen</title>
+  <title>Hash Generator - CyberKitchen</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
-      --bg:     #f8fafc; --surf:   #ffffff;
-      --inset:  #f1f5f9; --inset2: #e4eaf1;
-      --txt:    #0f172a; --muted:  #64748b;
-      --acc:    #3b82f6; --ok:     #10b981;
-      --err:    #ef4444; --warn:   #f59e0b;
-      --bdr:    #e2e8f0; --shd:    rgba(0,0,0,.07);
+      --bg:#f8fafc; --surf:#ffffff;
+      --inset:#f1f5f9; --inset2: #e4eaf1;
+      --txt:#0f172a; --muted:#64748b;
+      --acc:#3b82f6; --ok:#10b981;
+      --err:#ef4444; --warn:#f59e0b;
+      --bdr:#e2e8f0; --shd:rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
       --bg:#0d1117; --surf:#161b22; --inset:#21262d; --inset2:#2d333b;
@@ -101,7 +101,7 @@
     textarea::placeholder { color:var(--muted); opacity:.55; font-style:italic; }
     textarea::-webkit-scrollbar { width:6px; }
     textarea::-webkit-scrollbar-thumb { background:var(--bdr); border-radius:3px; }
-    /* Hash output — read-only style */
+    /* Hash output - read-only style */
     textarea.hash-out { font-size:13px; }
     textarea.verify-match { border-color:var(--ok) !important; background:rgba(16,185,129,.06) !important; }
     textarea.verify-fail  { border-color:var(--err) !important; background:rgba(239,68,68,.06) !important; }
@@ -310,8 +310,8 @@
 
         <!-- Algorithm info -->
         <div class="info-bar">
-          <span id="algoInfo">—</span>
-          <span class="badge badge-inf" id="algoBadge">—</span>
+          <span id="algoInfo">-</span>
+          <span class="badge badge-inf" id="algoBadge">-</span>
         </div>
 
         <div class="divider"></div>
@@ -396,7 +396,7 @@
         <!-- digest length indicator -->
         <span id="digestLen" style="font-size:11px;color:var(--muted);white-space:nowrap"></span>
       </div>
-      <textarea id="hashOutput" class="hash-out" placeholder="Hash digest appears here — or paste a known hash to verify"></textarea>
+      <textarea id="hashOutput" class="hash-out" placeholder="Hash digest appears here - or paste a known hash to verify"></textarea>
 
       <!-- All-hashes multi-output -->
       <div id="allHashesWrap" style="display:none;flex-direction:column;gap:6px;overflow-y:auto;flex:1;min-height:0">
@@ -418,7 +418,7 @@
 ══════════════════════════════════════════════════════════════════ */
 var ALGOS = [
   // Sorted low → high bits; ALL always last
-  { id:'CRC32',      label:'CRC-32',    desc:'CRC-32 (32-bit — checksum, not crypto)',  bits:32,   hmac:false, impl: crc32 },
+  { id:'CRC32',      label:'CRC-32',    desc:'CRC-32 (32-bit - checksum, not crypto)',  bits:32,   hmac:false, impl: crc32 },
   { id:'MD5',        label:'MD5',       desc:'MD5 (128-bit)',                            bits:128,  hmac:false, impl: md5 },
   { id:'SHA1',       label:'SHA-1',     desc:'SHA-1 (160-bit)',                          bits:160,  hmac:true,  wc:'SHA-1'   },
   { id:'RIPEMD160',  label:'RIPEMD-160',desc:'RIPEMD-160 (160-bit)',                     bits:160,  hmac:false, impl: ripemd160 },
@@ -632,8 +632,8 @@ async function doVerify() {
   try {
     var raw = gv('inputData');
     var knownHash = gv('hashOutput').trim();
-    if (!raw)       throw new Error('Input data is empty — enter data on the left');
-    if (!knownHash) throw new Error('Hash is empty — paste the known hash in the right panel');
+    if (!raw)       throw new Error('Input data is empty - enter data on the left');
+    if (!knownHash) throw new Error('Hash is empty - paste the known hash in the right panel');
     if (_currentAlgo === 'ALL') throw new Error('Select a specific algorithm to verify');
 
     var inputFmt     = gv('inputFmt');
@@ -664,10 +664,10 @@ async function doVerify() {
     $('hashOutput').classList.add(match ? 'verify-match' : 'verify-fail');
 
     if (match) {
-      showStatus('Match — hash verified successfully', 'success');
+      showStatus('Match - hash verified successfully', 'success');
     } else {
       // Show what the correct hash is to help debug
-      showStatus('No match — expected: ' + computed_hex.slice(0,16) + '…', 'error');
+      showStatus('No match - expected: ' + computed_hex.slice(0,16) + '…', 'error');
     }
   } catch(e) { showStatus(e.message, 'error'); console.error(e); }
 }
@@ -797,7 +797,7 @@ document.addEventListener('keydown',function(e){
 
 /* ══════════════════════════════════════════════════════════════
    PURE-JS HASH IMPLEMENTATIONS
-   (no external libraries — all native)
+   (no external libraries - all native)
 ══════════════════════════════════════════════════════════════ */
 
 /* ─── MD5 ────────────────────────────────────────────────────── */

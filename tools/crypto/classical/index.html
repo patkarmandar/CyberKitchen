@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cipher Tool — CyberKitchen</title>
+  <title>Classical Ciphers - CyberKitchen</title>
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css'">
@@ -246,7 +246,7 @@
         <span class="link-text">CyberKitchen</span>
       </a>
     </div>
-    <h1>Cipher Tool</h1>
+    <h1>Classical Ciphers</h1>
     <div class="hdr-right">
       <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
         <i class="fa-solid fa-moon" id="themeIcon"></i>
@@ -281,8 +281,8 @@
 
         <!-- Info -->
         <div class="info-bar">
-          <span id="cipherInfo">—</span>
-          <span class="badge" id="cipherBadge">—</span>
+          <span id="cipherInfo">-</span>
+          <span class="badge" id="cipherBadge">-</span>
         </div>
 
         <!-- ══ Parameter panels (shown per selection) ══ -->
@@ -290,7 +290,7 @@
         <!-- Caesar shift -->
         <div class="cipher-opts" id="optCaesar">
           <div class="field">
-            <label>Shift (1–25) — ROT-13 = 13</label>
+            <label>Shift (1–25) - ROT-13 = 13</label>
             <input type="number" id="caesarShift" class="inp-sm" value="13" min="1" max="25">
           </div>
         </div>
@@ -315,7 +315,7 @@
         <div class="cipher-opts" id="optAffine">
           <div class="row2">
             <div class="field">
-              <label>a — coprime to 26</label>
+              <label>a - coprime to 26</label>
               <input type="number" id="affineA" class="inp-sm" value="5" min="1" max="25">
             </div>
             <div class="field">
@@ -345,7 +345,7 @@
         <!-- Playfair key -->
         <div class="cipher-opts" id="optPlayfair">
           <div class="field">
-            <label>Keyword (letters only — I=J)</label>
+            <label>Keyword (letters only - I=J)</label>
             <input type="text" id="playfairKey" class="inp-sm" placeholder="e.g. MONARCHY" autocomplete="off" spellcheck="false">
           </div>
           <div class="param-hint">Encrypts letter pairs. Non-alpha chars are removed. Output is uppercase digraphs.</div>
@@ -439,7 +439,7 @@
         <button class="btn btn-ghost xs" onclick="dlText('ciphertext','ciphertext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
       </div>
-      <textarea id="ciphertext" placeholder="Ciphertext appears here — or paste ciphertext to decipher"></textarea>
+      <textarea id="ciphertext" placeholder="Ciphertext appears here - or paste ciphertext to decipher"></textarea>
     </div>
 
   </div>
@@ -453,35 +453,35 @@
 ══════════════════════════════════════════════════════════════ */
 var CIPHERS = [
   // ── Substitution ──────────────────────────────────────────
-  { id:'rot13',      label:'ROT-13',      group:'Substitution', desc:'ROT-13 — shift 13, symmetric (no key)',         badge:'sub',  badgeClass:'badge-sub',  opts:null },
-  { id:'rot47',      label:'ROT-47',      group:'Substitution', desc:'ROT-47 — printable ASCII rotation, symmetric', badge:'sub',  badgeClass:'badge-sub',  opts:null },
-  { id:'caesar',     label:'Caesar',      group:'Substitution', desc:'Caesar — mono-alphabetic shift cipher',         badge:'sub',  badgeClass:'badge-sub',  opts:'optCaesar' },
-  { id:'atbash',     label:'Atbash',      group:'Substitution', desc:'Atbash — reverse alphabet (A↔Z, symmetric)',   badge:'sub',  badgeClass:'badge-sub',  opts:null },
-  { id:'a1z26',      label:'A1Z26',       group:'Substitution', desc:'A1Z26 — A=1, B=2 … Z=26 number substitution', badge:'sub',  badgeClass:'badge-sub',  opts:null },
-  { id:'bacon',      label:'Bacon',       group:'Substitution', desc:"Bacon's cipher — A=AAAAA … Z=ZZZZZ (A/B)",    badge:'sub',  badgeClass:'badge-sub',  opts:null },
-  { id:'polybius',   label:'Polybius',    group:'Substitution', desc:'Polybius square — 5×5 grid, row+col pairs',    badge:'sub',  badgeClass:'badge-sub',  opts:'optPolybius' },
-  { id:'affine',     label:'Affine',      group:'Substitution', desc:'Affine — E(x) = (ax+b) mod 26',               badge:'sub',  badgeClass:'badge-sub',  opts:'optAffine' },
-  { id:'morse',      label:'Morse',       group:'Substitution', desc:'Morse code — international dots and dashes',   badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'rot13',      label:'ROT-13',      group:'Substitution', desc:'ROT-13 - shift 13, symmetric (no key)',         badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'rot47',      label:'ROT-47',      group:'Substitution', desc:'ROT-47 - printable ASCII rotation, symmetric', badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'caesar',     label:'Caesar',      group:'Substitution', desc:'Caesar - mono-alphabetic shift cipher',         badge:'sub',  badgeClass:'badge-sub',  opts:'optCaesar' },
+  { id:'atbash',     label:'Atbash',      group:'Substitution', desc:'Atbash - reverse alphabet (A↔Z, symmetric)',   badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'a1z26',      label:'A1Z26',       group:'Substitution', desc:'A1Z26 - A=1, B=2 … Z=26 number substitution', badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'bacon',      label:'Bacon',       group:'Substitution', desc:"Bacon's cipher - A=AAAAA … Z=ZZZZZ (A/B)",    badge:'sub',  badgeClass:'badge-sub',  opts:null },
+  { id:'polybius',   label:'Polybius',    group:'Substitution', desc:'Polybius square - 5×5 grid, row+col pairs',    badge:'sub',  badgeClass:'badge-sub',  opts:'optPolybius' },
+  { id:'affine',     label:'Affine',      group:'Substitution', desc:'Affine - E(x) = (ax+b) mod 26',               badge:'sub',  badgeClass:'badge-sub',  opts:'optAffine' },
+  { id:'morse',      label:'Morse',       group:'Substitution', desc:'Morse code - international dots and dashes',   badge:'sub',  badgeClass:'badge-sub',  opts:null },
 
   // ── Polyalphabetic ────────────────────────────────────────
-  { id:'vigenere',   label:'Vigenère',    group:'Polyalphabetic', desc:'Vigenère — keyword-based polyalphabetic',     badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
-  { id:'beaufort',   label:'Beaufort',    group:'Polyalphabetic', desc:'Beaufort — reciprocal Vigenère (k-m mod 26)', badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
-  { id:'variantbf',  label:'Variant BF',  group:'Polyalphabetic', desc:'Variant Beaufort — m-k mod 26',              badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
-  { id:'gronsfeld',  label:'Gronsfeld',   group:'Polyalphabetic', desc:'Gronsfeld — Vigenère with numeric key',       badge:'poly', badgeClass:'badge-poly', opts:'optGronsfeld' },
-  { id:'porta',      label:'Porta',       group:'Polyalphabetic', desc:'Porta — 13-row tableau, symmetric',          badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
-  { id:'autokey',    label:'Autokey',     group:'Polyalphabetic', desc:'Autokey — Vigenère with plaintext appended to key', badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
-  { id:'runningkey', label:'Running Key', group:'Polyalphabetic', desc:'Running Key — Vigenère with long text key',  badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'vigenere',   label:'Vigenère',    group:'Polyalphabetic', desc:'Vigenère - keyword-based polyalphabetic',     badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'beaufort',   label:'Beaufort',    group:'Polyalphabetic', desc:'Beaufort - reciprocal Vigenère (k-m mod 26)', badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'variantbf',  label:'Variant BF',  group:'Polyalphabetic', desc:'Variant Beaufort - m-k mod 26',              badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'gronsfeld',  label:'Gronsfeld',   group:'Polyalphabetic', desc:'Gronsfeld - Vigenère with numeric key',       badge:'poly', badgeClass:'badge-poly', opts:'optGronsfeld' },
+  { id:'porta',      label:'Porta',       group:'Polyalphabetic', desc:'Porta - 13-row tableau, symmetric',          badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'autokey',    label:'Autokey',     group:'Polyalphabetic', desc:'Autokey - Vigenère with plaintext appended to key', badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
+  { id:'runningkey', label:'Running Key', group:'Polyalphabetic', desc:'Running Key - Vigenère with long text key',  badge:'poly', badgeClass:'badge-poly', opts:'optKeyword' },
 
   // ── Transposition ─────────────────────────────────────────
-  { id:'railfence',  label:'Rail Fence',  group:'Transposition', desc:'Rail Fence — zig-zag write, row-by-row read', badge:'tran', badgeClass:'badge-tran', opts:'optRailFence' },
-  { id:'columnar',   label:'Columnar',    group:'Transposition', desc:'Columnar — keyword-ordered column transposition', badge:'tran', badgeClass:'badge-tran', opts:'optColumnar' },
-  { id:'scytale',    label:'Scytale',     group:'Transposition', desc:'Scytale — ancient Greek cylinder cipher',     badge:'tran', badgeClass:'badge-tran', opts:'optScytale' },
-  { id:'routecipher',label:'Route',       group:'Transposition', desc:'Route cipher — spiral read from grid',        badge:'tran', badgeClass:'badge-tran', opts:'optRailFence' },
+  { id:'railfence',  label:'Rail Fence',  group:'Transposition', desc:'Rail Fence - zig-zag write, row-by-row read', badge:'tran', badgeClass:'badge-tran', opts:'optRailFence' },
+  { id:'columnar',   label:'Columnar',    group:'Transposition', desc:'Columnar - keyword-ordered column transposition', badge:'tran', badgeClass:'badge-tran', opts:'optColumnar' },
+  { id:'scytale',    label:'Scytale',     group:'Transposition', desc:'Scytale - ancient Greek cylinder cipher',     badge:'tran', badgeClass:'badge-tran', opts:'optScytale' },
+  { id:'routecipher',label:'Route',       group:'Transposition', desc:'Route cipher - spiral read from grid',        badge:'tran', badgeClass:'badge-tran', opts:'optRailFence' },
 
   // ── Polygraphic ───────────────────────────────────────────
-  { id:'playfair',   label:'Playfair',    group:'Polygraphic',   desc:'Playfair — 5×5 digraph substitution',         badge:'poly', badgeClass:'badge-poly', opts:'optPlayfair' },
-  { id:'foursquare', label:'Four-Square', group:'Polygraphic',   desc:'Four-Square — two-key digraph cipher',         badge:'poly', badgeClass:'badge-poly', opts:'optFourSquare' },
-  { id:'twosquare',  label:'Two-Square',  group:'Polygraphic',   desc:'Two-Square (Wheatstone) — horizontal digraph', badge:'poly', badgeClass:'badge-poly', opts:'optPlayfair' },
+  { id:'playfair',   label:'Playfair',    group:'Polygraphic',   desc:'Playfair - 5×5 digraph substitution',         badge:'poly', badgeClass:'badge-poly', opts:'optPlayfair' },
+  { id:'foursquare', label:'Four-Square', group:'Polygraphic',   desc:'Four-Square - two-key digraph cipher',         badge:'poly', badgeClass:'badge-poly', opts:'optFourSquare' },
+  { id:'twosquare',  label:'Two-Square',  group:'Polygraphic',   desc:'Two-Square (Wheatstone) - horizontal digraph', badge:'poly', badgeClass:'badge-poly', opts:'optPlayfair' },
 
   // ── XOR / Bitwise ─────────────────────────────────────────
   { id:'xorbyte',    label:'XOR Byte',    group:'Bitwise',       desc:'XOR every byte with a single hex key byte',   badge:'mod',  badgeClass:'badge-mod',  opts:'optXOR' },
@@ -627,7 +627,7 @@ function vigenereDec(s,key){
   key=cleanKey(key)||'A';var ki=0;
   return s.replace(/[a-zA-Z]/g,function(c){var b=c<='Z'?65:97,ks=key.charCodeAt(ki++%key.length)-65;return String.fromCharCode((c.charCodeAt(0)-b-ks+26)%26+b);});
 }
-// Beaufort: E(c,k)=(k-c+26)%26 — same function used for encode and decode
+// Beaufort: E(c,k)=(k-c+26)%26 - same function used for encode and decode
 function beaufort(s,key){
   key=cleanKey(key)||'A';var ki=0;
   return s.replace(/[a-zA-Z]/g,function(c){var b=c<='Z'?65:97,ks=key.charCodeAt(ki++%key.length)-65,cc=c.charCodeAt(0)-b;return String.fromCharCode((ks-cc+26)%26+b);});
@@ -656,7 +656,7 @@ function portaCipher(s,key){
     var cc=c.toUpperCase().charCodeAt(0)-65;
     var kc=key.charCodeAt(ki++%key.length)-65;
     var row=Math.floor(kc/2);
-    // Porta table (simplified — uses 13 half-alphabet rows)
+    // Porta table (simplified - uses 13 half-alphabet rows)
     var topHalf='ABCDEFGHIJKLM', botHalf='NOPQRSTUVWXYZ';
     var top=topHalf.split(''), bot=botHalf.split('');
     // Row-based substitution: rotate bot by row
@@ -742,7 +742,7 @@ function scytaleDec(s,turns){
   for(var row=0;row<rows;row++)for(var col=0;col<turns;col++)out+=grid[col][row]||'';
   return out.replace(/_+$/,'');
 }
-// Route cipher — spiral out from corners (simplified: column read then row read)
+// Route cipher - spiral out from corners (simplified: column read then row read)
 function routeEnc(s,rails){
   var cols=Math.ceil(s.length/Math.max(2,rails));
   var rows=Math.ceil(s.length/cols);
@@ -924,7 +924,7 @@ function doVerify() {
     }
     $('ciphertext').classList.remove('verify-match','verify-fail');
     $('ciphertext').classList.add(match ? 'verify-match' : 'verify-fail');
-    showStatus(match ? 'Match — both panels correspond' : 'No match — panels do not correspond', match ? 'success' : 'error');
+    showStatus(match ? 'Match - both panels correspond' : 'No match - panels do not correspond', match ? 'success' : 'error');
   } catch(e) { showStatus(e.message, 'error'); }
 }
 
