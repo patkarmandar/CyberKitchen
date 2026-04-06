@@ -11,7 +11,7 @@
     :root {
       --bg:#f8fafc; --surf:#ffffff; --inset:#f1f5f9; --inset2:#e4eaf1;
       --txt:#0f172a; --muted:#64748b; --acc:#3b82f6;
-      --ok:#10b981;  --err:#ef4444; --warn:#f59e0b;
+      --ok:#10b981; --err:#ef4444; --warn:#f59e0b;
       --bdr:#e2e8f0; --shd:rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
@@ -23,7 +23,7 @@
     body {
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
       font-size:14.5px; background:var(--bg); color:var(--txt);
-      min-height:100vh; line-height:1.5;
+      min-height:100vh; line-height:1.5; display:flex; flex-direction:column;
       transition:background .25s,color .25s;
     }
 
@@ -38,7 +38,7 @@
       font-size:18px; font-weight:800; letter-spacing:-.3px;
       background:linear-gradient(130deg,#3b82f6,#8b5cf6);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      background-clip:text; text-decoration:none; width: fit-content;
+      background-clip:text; text-decoration:none; width:fit-content;
     }
     .brand i { font-size:18px; -webkit-text-fill-color:#8b5cf6; }
     .hdr-right { display:flex; align-items:center; justify-content:flex-end; }
@@ -60,12 +60,14 @@
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
       background-clip:text; margin-bottom:12px;
     }
-    .hero p {
-      color:var(--muted); font-size:16px; line-height:1.6;
+    .hero-sub {
+      color:var(--muted); font-size:15px; line-height:1.65;
+      max-width:620px; margin:0 auto;
     }
 
     /* ── Main grid ──────────────────────────────────────────── */
     main {
+      flex:1;
       max-width:1200px; margin:0 auto;
       padding:0 24px 60px;
       display:grid;
@@ -81,10 +83,7 @@
       transition:border-color .18s, box-shadow .18s;
     }
     .card:hover { border-color:var(--acc); box-shadow:0 4px 16px var(--shd); }
-
-    .card-header {
-      display:flex; align-items:center; gap:10px;
-    }
+    .card-header { display:flex; align-items:center; gap:10px; }
     .card-icon {
       width:36px; height:36px; border-radius:8px;
       display:flex; align-items:center; justify-content:center;
@@ -93,7 +92,7 @@
     .card-title { font-size:15px; font-weight:700; }
     .card-desc  { font-size:12px; color:var(--muted); line-height:1.5; }
 
-    /* ── Tool links inside a card ───────────────────────────── */
+    /* ── Tool links ─────────────────────────────────────────── */
     .tool-list { display:flex; flex-direction:column; gap:4px; }
     .tool-link {
       display:flex; align-items:center; gap:8px;
@@ -102,9 +101,7 @@
       font-size:13px; font-weight:500;
       transition:all .15s; border:1px solid transparent;
     }
-    .tool-link:hover {
-      background:var(--inset); border-color:var(--bdr); color:var(--acc);
-    }
+    .tool-link:hover { background:var(--inset); border-color:var(--bdr); color:var(--acc); }
     .tool-link i { font-size:12px; color:var(--muted); flex-shrink:0; width:14px; text-align:center; }
     .tool-link:hover i { color:var(--acc); }
     .tool-tag {
@@ -117,45 +114,56 @@
     .cat-hash   .card-icon { background:rgba(16,185,129,.12); color:#10b981; }
     .cat-encode .card-icon { background:rgba(245,158,11,.12); color:#f59e0b; }
     .cat-cipher .card-icon { background:rgba(139,92,246,.12); color:#8b5cf6; }
-    .cat-convert.card-icon { background:rgba(6,182,212,.12);  color:#06b6d4; }
+    .cat-convert .card-icon { background:rgba(6,182,212,.12); color:#06b6d4; }
     .cat-gen    .card-icon { background:rgba(236,72,153,.12); color:#ec4899; }
 
-    .cat-crypto { --card-acc:#3b82f6; }
-    .cat-hash   { --card-acc:#10b981; }
-    .cat-encode { --card-acc:#f59e0b; }
-    .cat-cipher { --card-acc:#8b5cf6; }
-    .cat-convert{ --card-acc:#06b6d4; }
-    .cat-gen    { --card-acc:#ec4899; }
-
+    .cat-crypto  { --card-acc:#3b82f6; }
+    .cat-hash    { --card-acc:#10b981; }
+    .cat-encode  { --card-acc:#f59e0b; }
+    .cat-cipher  { --card-acc:#8b5cf6; }
+    .cat-convert { --card-acc:#06b6d4; }
+    .cat-gen     { --card-acc:#ec4899; }
     .card:hover .card-title { color:var(--card-acc, var(--acc)); }
-
-    /* ── Hero subtitle ───────────────────────────────────────── */
-    .hero-sub {
-      color:var(--muted); font-size:14px; line-height:1.65;
-      max-width:680px; margin:10px auto 0;
-    }
 
     /* ── Footer ─────────────────────────────────────────────── */
     footer {
-      text-align:center; padding:20px 24px;
       border-top:1px solid var(--bdr);
+      background:var(--surf);
+      padding:18px 24px;
+    }
+    .footer-inner {
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .footer-left {
+      font-size:13px; font-weight:700; color:var(--muted);
+      letter-spacing:-.1px;
+    }
+    .footer-center {
+      font-size:12px; color:var(--muted);
+    }
+    .footer-right {
+      display:flex; align-items:center;
     }
     .footer-gh {
-      display:inline-flex; align-items:center; gap:7px;
-      font-size:13px; font-weight:600; color:var(--muted);
-      text-decoration:none; padding:7px 14px;
-      border:1px solid var(--bdr); border-radius:8px;
-      background:var(--surf); transition:all .18s;
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:13px; font-weight:500; color:var(--muted);
+      text-decoration:none; transition:color .15s;
     }
-    .footer-gh i { font-size:16px; }
-    .footer-gh:hover { color:var(--txt); border-color:var(--txt); background:var(--inset); }
+    .footer-gh i { font-size:14px; }
+    .footer-gh:hover { color:var(--txt); }
+
+    @media (max-width:540px) {
+      .footer-inner { flex-direction:column; align-items:center; gap:6px; text-align:center; }
+    }
 
     /* ── Responsive ─────────────────────────────────────────── */
     @media (max-width:640px) {
       header { padding:12px 16px; }
       .hero  { padding:36px 16px 28px; }
       .hero h1 { font-size:26px; }
-      main   { padding:0 16px 40px; grid-template-columns:1fr; }
+      main  { padding:0 16px 40px; grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -176,7 +184,7 @@
 
   <div class="hero">
     <h1>Recipes for Hackers</h1>
-    <p class="hero-sub">CyberKitchen - a browser-based suite for encryption, hashing, encoding, conversion, and more. All processing happens locally in your browser, and no data leaves your machine.</p>
+    <p class="hero-sub">A browser-based suite for encryption, hashing, encoding, conversion, and more. All processing happens locally — no data ever leaves your machine.</p>
   </div>
 
   <main>
@@ -302,13 +310,20 @@
   </main>
 
   <footer>
-    <a href="https://github.com/patkarmandar/CyberKitchen" target="_blank" rel="noopener" class="footer-gh">
-      <i class="fa-brands fa-github"></i>
-      patkarmandar/CyberKitchen
-    </a>
+    <div class="footer-inner">
+      <span class="footer-left">&copy; <span id="yr"></span> &middot; MIT License</span>
+      <!-- <span class="footer-center">MIT License</span> -->
+      <div class="footer-right">
+        <a href="https://github.com/patkarmandar/CyberKitchen" target="_blank" rel="noopener" class="footer-gh">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+      </div>
+    </div>
   </footer>
 
 <script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
   function toggleTheme() {
     var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);

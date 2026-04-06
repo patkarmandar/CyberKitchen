@@ -11,7 +11,7 @@
     :root {
       --bg:#f8fafc; --surf:#ffffff; --inset:#f1f5f9; --inset2:#e4eaf1;
       --txt:#0f172a; --muted:#64748b; --acc:#3b82f6;
-      --err:#ef4444; --bdr:#e2e8f0; --shd:rgba(0,0,0,.07);
+      --bdr:#e2e8f0; --shd:rgba(0,0,0,.07);
     }
     [data-theme="dark"] {
       --bg:#0d1117; --surf:#161b22; --inset:#21262d; --inset2:#2d333b;
@@ -54,90 +54,90 @@
       flex:1; display:flex; align-items:center; justify-content:center;
       padding:40px 24px;
     }
-    .err-card {
-      background:var(--surf); border:1px solid var(--bdr); border-radius:16px;
-      padding:48px 40px; box-shadow:0 4px 24px var(--shd);
-      text-align:center; max-width:480px; width:100%;
+
+    .err-wrap {
+      text-align:center; max-width:400px; width:100%;
     }
 
     /* Big 404 */
     .err-code {
-      font-size:96px; font-weight:800; line-height:1; letter-spacing:-4px;
+      font-size:120px; font-weight:800; line-height:1; letter-spacing:-6px;
       background:linear-gradient(130deg,#3b82f6 0%,#8b5cf6 60%,#ec4899 100%);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      background-clip:text; margin-bottom:8px;
+      background-clip:text; margin-bottom:4px;
+      /* subtle blur double for depth */
+      filter:drop-shadow(0 2px 24px rgba(139,92,246,.18));
     }
 
-    .err-icon {
-      font-size:28px; margin-bottom:16px; color:var(--muted);
-    }
     .err-title {
-      font-size:20px; font-weight:700; margin-bottom:10px;
+      font-size:18px; font-weight:700; margin-bottom:8px; color:var(--txt);
     }
     .err-msg {
-      font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:28px;
+      font-size:14px; color:var(--muted); line-height:1.65; margin-bottom:24px;
     }
+
     .err-path {
-      display:inline-block; background:var(--inset); border:1px solid var(--bdr);
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--inset); border:1px solid var(--bdr);
       border-radius:6px; padding:5px 12px;
       font-family:'SF Mono','Fira Code','Menlo',monospace;
       font-size:12px; color:var(--muted); margin-bottom:28px;
       max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     }
+    .err-path i { font-size:10px; flex-shrink:0; }
 
     /* Buttons */
     .btn-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
     .btn-home {
       display:inline-flex; align-items:center; gap:8px;
-      padding:9px 20px; border-radius:8px; font-size:13px; font-weight:700;
+      padding:9px 22px; border-radius:8px; font-size:13px; font-weight:700;
       background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
       text-decoration:none; border:none; cursor:pointer;
       transition:all .18s;
     }
-    .btn-home:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 12px rgba(59,130,246,.35); }
+    .btn-home:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 14px rgba(59,130,246,.35); }
     .btn-back {
       display:inline-flex; align-items:center; gap:8px;
-      padding:9px 20px; border-radius:8px; font-size:13px; font-weight:700;
+      padding:9px 22px; border-radius:8px; font-size:13px; font-weight:700;
       background:var(--inset); color:var(--txt);
       border:1px solid var(--bdr); cursor:pointer;
       text-decoration:none; transition:all .18s;
     }
     .btn-back:hover { background:var(--inset2); }
 
-    /* Quick links */
-    .quick-links {
-      margin-top:32px; padding-top:24px; border-top:1px solid var(--bdr);
-    }
-    .quick-label { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-bottom:10px; }
-    .quick-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-    .quick-link {
-      display:flex; flex-direction:column; align-items:center; gap:4px;
-      padding:10px 6px; border:1px solid var(--bdr); border-radius:8px;
-      text-decoration:none; color:var(--muted); font-size:11px; font-weight:600;
-      background:var(--inset); transition:all .16s;
-    }
-    .quick-link i { font-size:15px; }
-    .quick-link:hover { background:var(--inset2); color:var(--acc); border-color:var(--acc); }
-
     /* ── Footer ─────────────────────────────────────────────── */
     footer {
-      text-align:center; padding:20px 24px;
       border-top:1px solid var(--bdr);
+      background:var(--surf);
+      padding:18px 24px;
+    }
+    .footer-inner {
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .footer-left {
+      font-size:13px; font-weight:700; color:var(--muted);
+      letter-spacing:-.1px;
+    }
+    .footer-center {
+      font-size:12px; color:var(--muted);
+    }
+    .footer-right {
+      display:flex; align-items:center;
     }
     .footer-gh {
-      display:inline-flex; align-items:center; gap:7px;
-      font-size:13px; font-weight:600; color:var(--muted);
-      text-decoration:none; padding:7px 14px;
-      border:1px solid var(--bdr); border-radius:8px;
-      background:var(--surf); transition:all .18s;
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:13px; font-weight:500; color:var(--muted);
+      text-decoration:none; transition:color .15s;
     }
-    .footer-gh i { font-size:16px; }
-    .footer-gh:hover { color:var(--txt); border-color:var(--txt); background:var(--inset); }
+    .footer-gh i { font-size:14px; }
+    .footer-gh:hover { color:var(--txt); }
 
-    @media (max-width:540px) {
-      .err-card { padding:32px 20px; }
-      .err-code { font-size:64px; }
-      .quick-grid { grid-template-columns:repeat(2,1fr); }
+    @media (max-width:480px) {
+      .err-code  { font-size:80px; letter-spacing:-3px; }
+      .err-title { font-size:16px; }
+      .footer-inner { flex-direction:column; align-items:center; gap:6px; text-align:center; }
     }
   </style>
 </head>
@@ -156,54 +156,33 @@
   </header>
 
   <main>
-    <div class="err-card">
+    <div class="err-wrap">
       <div class="err-code">404</div>
-      <div class="err-icon"><i class="fa-solid fa-circle-xmark"></i></div>
       <div class="err-title">Page not found</div>
-      <div class="err-msg">The tool or page you're looking for doesn't exist, was moved, or the URL is incorrect.</div>
-      <div class="err-path" id="errPath">/</div>
-
+      <div class="err-msg">The tool or page you're looking for doesn't exist,<br>was moved, or the URL is incorrect.</div>
+      <div class="err-path"><i class="fa-solid fa-slash"></i><span id="errPath">/</span></div>
       <div class="btn-row">
         <a href="/CyberKitchen" class="btn-home"><i class="fa-solid fa-house"></i> Back to Home</a>
         <button class="btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Go Back</button>
-      </div>
-
-      <div class="quick-links">
-        <div class="quick-label">Quick access</div>
-        <div class="quick-grid">
-          <a href="/CyberKitchen/tools/crypto/aes/" class="quick-link">
-            <i class="fa-solid fa-lock"></i> AES
-          </a>
-          <a href="/CyberKitchen/tools/crypto/rsa/" class="quick-link">
-            <i class="fa-solid fa-shield-halved"></i> RSA
-          </a>
-          <a href="/CyberKitchen/tools/hash/" class="quick-link">
-            <i class="fa-solid fa-hashtag"></i> Hash
-          </a>
-          <a href="/CyberKitchen/tools/encode/" class="quick-link">
-            <i class="fa-solid fa-code"></i> Encode
-          </a>
-          <a href="/CyberKitchen/tools/crypto/classical/" class="quick-link">
-            <i class="fa-solid fa-scroll"></i> Ciphers
-          </a>
-          <a href="/CyberKitchen/tools/convert/number/" class="quick-link">
-            <i class="fa-solid fa-calculator"></i> Numbers
-          </a>
-        </div>
       </div>
     </div>
   </main>
 
   <footer>
-    <a href="https://github.com/patkarmandar/CyberKitchen" target="_blank" rel="noopener" class="footer-gh">
-      <i class="fa-brands fa-github"></i>
-      patkarmandar/CyberKitchen
-    </a>
+    <div class="footer-inner">
+      <span class="footer-left">&copy; <span id="yr"></span> &middot; MIT License</span>
+      <!-- <span class="footer-center">MIT License</span> -->
+      <div class="footer-right">
+        <a href="https://github.com/patkarmandar/CyberKitchen" target="_blank" rel="noopener" class="footer-gh">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+      </div>
+    </div>
   </footer>
 
 <script>
-  // Show current path in the error card
   document.getElementById('errPath').textContent = window.location.pathname || '/';
+  document.getElementById('yr').textContent = new Date().getFullYear();
 
   function toggleTheme() {
     var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
