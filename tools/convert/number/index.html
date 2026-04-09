@@ -262,7 +262,7 @@
         <div class="tb-fill"></div>
         <button class="swap-btn" onclick="doSwap()"><i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span></button>
       </div>
-      <textarea id="iIn" placeholder="Enter a number in the selected FROM base&#10;&#10;Examples:&#10;  Decimal  →  255&#10;  Binary   →  11111111&#10;  Hex      →  FF or 0xFF&#10;  Octal    →  377&#10;  Base58   →  Uf7H"></textarea>
+      <textarea id="iIn" placeholder="Type or paste number to convert..."></textarea>
     </div>
 
     <!-- MIDDLE: Config -->
@@ -319,8 +319,8 @@
             <i class="fa-solid fa-arrow-right" style="font-size:11px"></i>
           </button>
           <button class="btn-rev" onclick="doReverse()" title="Reverse output→input (Ctrl+D)">
-            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
-            <i class="fa-solid fa-rotate-left"></i> Reverse
+            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i> Reverse
+            <i class="fa-solid fa-rotate-left"></i>
           </button>
         </div>
 
@@ -352,7 +352,7 @@
         <button class="btn btn-ghost xs" onclick="dlText('iOut','output.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
       </div>
-      <textarea id="iOut" placeholder="Converted result appears here - or paste a value to reverse-convert"></textarea>
+      <textarea id="iOut" placeholder="Type or paste number to convert..."></textarea>
       <div class="all-wrap" id="aWrap"></div>
     </div>
 
