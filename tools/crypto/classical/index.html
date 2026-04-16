@@ -174,14 +174,7 @@
     .btn-ghost { background:var(--inset); color:var(--txt); border:1px solid var(--bdr); }
     .btn-ghost:hover { background:var(--inset2); }
 
-    /* Encipher LEFT (→), Decipher RIGHT (←) */
-    .btn-encipher {
-      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
-      background:linear-gradient(135deg,#8b5cf6,#7c3aed); color:#fff;
-      border:none; border-radius:6px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center; gap:6px;
-      transition:all .18s;
-    }
+    /* Decipher LEFT (→), Encipher RIGHT (←) */
     .btn-decipher {
       flex:1; padding:9px 12px; font-size:13px; font-weight:700;
       background:linear-gradient(135deg,#ec4899,#db2777); color:#fff;
@@ -189,7 +182,14 @@
       display:flex; align-items:center; justify-content:center; gap:6px;
       transition:all .18s;
     }
-    .btn-encipher:hover, .btn-decipher:hover {
+    .btn-encipher {
+      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
+      background:linear-gradient(135deg,#8b5cf6,#7c3aed); color:#fff;
+      border:none; border-radius:6px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .18s;
+    }
+    .btn-decipher:hover, .btn-encipher:hover {
       filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 12px var(--shd);
     }
     .btn-verify {
@@ -256,19 +256,19 @@
 
   <div class="layout">
 
-    <!-- ══ LEFT: Plaintext ══════════════════════════════════ -->
+    <!-- ══ LEFT: Ciphertext ═════════════════════════════════ -->
     <div class="panel">
-      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> PLAINTEXT</div>
+      <div class="panel-hdr"><i class="fa-solid fa-shield-halved"></i> CIPHERTEXT</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('plaintext')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
-        <button class="btn btn-ghost xs" onclick="clearField('plaintext')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
-        <button class="btn btn-ghost xs" onclick="dlText('plaintext','plaintext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <button class="btn btn-ghost xs" onclick="copyText('ciphertext')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('ciphertext')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('ciphertext','ciphertext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
         <button class="swap-btn" onclick="swapPanels()">
           <i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span>
         </button>
       </div>
-      <textarea id="plaintext" placeholder="Type or paste plaintext to encipher..."></textarea>
+      <textarea id="ciphertext" placeholder="Type or paste ciphertext to decipher..."></textarea>
     </div>
 
     <!-- ══ MIDDLE: Configuration ════════════════════════════ -->
@@ -393,15 +393,15 @@
 
         <div class="divider"></div>
 
-        <!-- Encipher LEFT / Decipher RIGHT -->
+        <!-- Decipher LEFT / Encipher RIGHT -->
         <div class="act-row">
-          <button class="btn-encipher" onclick="doEncipher()" title="Encipher plaintext → ciphertext (Ctrl+E)">
-            <i class="fa-solid fa-lock"></i> Encipher
+          <button class="btn-decipher" onclick="doDecipher()" title="Decipher ciphertext → plaintext (Ctrl+D)">
+            <i class="fa-solid fa-unlock"></i> Decipher
             <i class="fa-solid fa-arrow-right" style="font-size:11px"></i>
           </button>
-          <button class="btn-decipher" onclick="doDecipher()" title="Decipher ciphertext → plaintext (Ctrl+D)">
-            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i> Decipher
-            <i class="fa-solid fa-unlock"></i>
+          <button class="btn-encipher" onclick="doEncipher()" title="Encipher plaintext → ciphertext (Ctrl+E)">
+            <i class="fa-solid fa-arrow-left style="font-size:11px"></i> Encipher
+            <i class="fa-solid fa-lock"></i>
           </button>
         </div>
 
@@ -430,16 +430,16 @@
       </div>
     </div>
 
-    <!-- ══ RIGHT: Ciphertext ═════════════════════════════════ -->
+    <!-- ══ RIGHT: Plaintext ══════════════════════════════════ -->
     <div class="panel">
-      <div class="panel-hdr"><i class="fa-solid fa-shield-halved"></i> CIPHERTEXT</div>
+      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> PLAINTEXT</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('ciphertext')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
-        <button class="btn btn-ghost xs" onclick="clearField('ciphertext')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
-        <button class="btn btn-ghost xs" onclick="dlText('ciphertext','ciphertext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <button class="btn btn-ghost xs" onclick="copyText('plaintext')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('plaintext')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('plaintext','plaintext.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
       </div>
-      <textarea id="ciphertext" placeholder="Type or paste ciphertext to decipher..."></textarea>
+      <textarea id="plaintext" placeholder="Type or paste plaintext to encipher..."></textarea>
     </div>
 
   </div>

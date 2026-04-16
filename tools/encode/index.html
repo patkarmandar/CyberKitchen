@@ -171,14 +171,7 @@
     .btn-ghost { background:var(--inset); color:var(--txt); border:1px solid var(--bdr); }
     .btn-ghost:hover { background:var(--inset2); }
 
-    /* Encode LEFT, Decode RIGHT - arrows show data-flow direction */
-    .btn-encode {
-      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
-      background:linear-gradient(135deg,#10b981,#059669); color:#fff;
-      border:none; border-radius:6px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center; gap:6px;
-      transition:all .18s;
-    }
+    /* Decode LEFT, Encode RIGHT - arrows show data-flow direction */
     .btn-decode {
       flex:1; padding:9px 12px; font-size:13px; font-weight:700;
       background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
@@ -186,7 +179,14 @@
       display:flex; align-items:center; justify-content:center; gap:6px;
       transition:all .18s;
     }
-    .btn-encode:hover, .btn-decode:hover {
+    .btn-encode {
+      flex:1; padding:9px 12px; font-size:13px; font-weight:700;
+      background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+      border:none; border-radius:6px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .18s;
+    }
+    .btn-decode:hover, .btn-encode:hover {
       filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 12px var(--shd);
     }
     .btn-verify {
@@ -262,19 +262,19 @@
 
   <div class="layout">
 
-    <!-- ══ LEFT: Decoded / Plain ════════════════════════════ -->
+    <!-- ══ LEFT: Encoded ════════════════════════════════════ -->
     <div class="panel">
-      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> DECODED / PLAIN</div>
+      <div class="panel-hdr"><i class="fa-solid fa-code"></i> ENCODED</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('inputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
-        <button class="btn btn-ghost xs" onclick="clearField('inputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
-        <button class="btn btn-ghost xs" onclick="dlText('inputData','decoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <button class="btn btn-ghost xs" onclick="copyText('outputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('outputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('outputData','encoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
         <button class="swap-btn" onclick="swapPanels()">
           <i class="fa-solid fa-right-left"></i><span class="swap-text"> Swap</span>
         </button>
       </div>
-      <textarea id="inputData" placeholder="Type or paste data to encode..."></textarea>
+      <textarea id="outputData" placeholder="Type or paste data to decode..."></textarea>
     </div>
 
     <!-- ══ MIDDLE: Configuration ═════════════════════════════ -->
@@ -290,8 +290,6 @@
           <span id="encInfo">-</span>
           <span class="badge badge-inf" id="encBadge">-</span>
         </div>
-
-
 
         <div class="divider"></div>
 
@@ -311,17 +309,18 @@
 
         <!--
           Button layout (data-flow arrows):
-          LEFT = Encode  → (plain LEFT panel → encoded RIGHT panel)
-          RIGHT = Decode ← (encoded RIGHT panel → plain LEFT panel)
+          LEFT = Decode → (encoded RIGHT panel → plain LEFT panel)
+          RIGHT = Encode ← (plain LEFT panel → encoded RIGHT panel)
         -->
+
         <div class="act-row">
-          <button class="btn-encode" onclick="doEncode()" title="Encode left → right (Ctrl+E)">
-            <i class="fa-solid fa-lock"></i> Encode
+          <button class="btn-decode" onclick="doDecode()" title="Decode right → left (Ctrl+D)">
+            <i class="fa-solid fa-unlock"></i> Decode
             <i class="fa-solid fa-arrow-right" style="font-size:11px"></i>
           </button>
-          <button class="btn-decode" onclick="doDecode()" title="Decode right → left (Ctrl+D)">
-            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i> Decode
-            <i class="fa-solid fa-unlock"></i>
+          <button class="btn-encode" onclick="doEncode()" title="Encode left → right (Ctrl+E)">
+            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i> Encode
+            <i class="fa-solid fa-lock"></i>
           </button>
         </div>
 
@@ -350,16 +349,16 @@
       </div>
     </div>
 
-    <!-- ══ RIGHT: Encoded ════════════════════════════════════ -->
+    <!-- ══ RIGHT: Decoded / Plain ════════════════════════════ -->
     <div class="panel">
-      <div class="panel-hdr"><i class="fa-solid fa-code"></i> ENCODED</div>
+      <div class="panel-hdr"><i class="fa-regular fa-file-lines"></i> DECODED / PLAIN</div>
       <div class="toolbar">
-        <button class="btn btn-ghost xs" onclick="copyText('outputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
-        <button class="btn btn-ghost xs" onclick="clearField('outputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
-        <button class="btn btn-ghost xs" onclick="dlText('outputData','encoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
+        <button class="btn btn-ghost xs" onclick="copyText('inputData')"><i class="fa-regular fa-copy"></i><span class="btn-text"> Copy</span></button>
+        <button class="btn btn-ghost xs" onclick="clearField('inputData')"><i class="fa-regular fa-trash-can"></i><span class="btn-text"> Clear</span></button>
+        <button class="btn btn-ghost xs" onclick="dlText('inputData','decoded.txt')"><i class="fa-solid fa-download"></i><span class="btn-text"> Save</span></button>
         <div class="tb-fill"></div>
       </div>
-      <textarea id="outputData" placeholder="Type or paste data to decode..."></textarea>
+      <textarea id="inputData" placeholder="Type or paste data to encode..."></textarea>
     </div>
 
   </div>
