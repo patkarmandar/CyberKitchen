@@ -58,11 +58,13 @@
 
     /* ── Layout ─────────────────────────────────────────── */
     .layout { display:grid; grid-template-columns:1fr 330px 1fr; gap:10px; }
+    .layout > * { min-width:0; }
     .panel {
       background:var(--surf); border:1px solid var(--bdr); border-radius:10px;
       padding:12px; box-shadow:0 1px 4px var(--shd);
       display:flex; flex-direction:column; gap:8px;
       height:calc(100vh - 70px); min-height:480px; max-height:840px;
+      min-width:0; overflow:hidden;
     }
     .panel-hdr {
       font-size:13px; font-weight:700; letter-spacing:.03em;
@@ -71,7 +73,7 @@
     .panel-hdr i { font-size:13px; color:var(--muted); }
 
     /* ── Toolbar ─────────────────────────────────────────── */
-    .toolbar { display:flex; align-items:center; gap:5px; flex-wrap:nowrap; flex-shrink:0; }
+    .toolbar { display:flex; align-items:center; gap:5px; flex-wrap:wrap; flex-shrink:0; }
     .tb-sep  { width:1px; height:14px; background:var(--bdr); flex-shrink:0; margin:0 2px; }
     .tb-fill { flex:1; min-width:0; }
     @media (max-width:600px) {
@@ -102,7 +104,7 @@
     /* ── Controls ────────────────────────────────────────── */
     .ctrl-scroll {
       flex:1; display:flex; flex-direction:column; gap:7px;
-      overflow-y:auto; min-height:0; padding-right:2px;
+      overflow-y:auto; overflow-x:hidden; min-height:0; padding-right:2px;
     }
     .ctrl-scroll::-webkit-scrollbar { width:4px; }
     .ctrl-scroll::-webkit-scrollbar-thumb { background:var(--bdr); border-radius:2px; }
@@ -252,6 +254,17 @@
     }
     @media (max-width:600px) {
       body { padding:6px 8px; } h1 { font-size:16px; }
+    }
+    @media (max-width:480px) {
+      .enc-grid-5 { grid-template-columns:repeat(3,1fr); }
+      .enc-grid-4 { grid-template-columns:repeat(4,1fr); }
+      .act-row { gap:5px; }
+      .btn-encode, .btn-decode { font-size:12px; padding:8px 8px; }
+      .bot-row .btn { font-size:11px; padding:5px 6px; }
+      .info-bar { gap:4px; padding:4px 6px; }
+      .info-bar span:first-child { font-size:10px; }
+      .badge { font-size:9px; padding:2px 5px; }
+      .enc-btn { font-size:10px; padding:4px 2px; }
     }
   </style>
 </head>
